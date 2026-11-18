@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lostly — the campus lost &amp; found portal. Create an account on the Campus Lost and Found Portal.">
+  <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+  <title>Create account · Lostly</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-family='system-ui,sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script>
+    // apply the saved colour theme before first paint, so there is no flash
+    (function () {
+      try {
+        var saved = localStorage.getItem('clf_theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/index.html">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span>Lostly<small>Campus Lost &amp; Found</small></span>
+    </a>
+
+    <div class="header-tools">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme" title="Switch between light and dark">
+        <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+        <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+      </button>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+        <span aria-hidden="true">☰</span><span class="nav-toggle-label">Menu</span>
+      </button>
+    </div>
+
+    <nav class="nav" id="main-nav" aria-label="Main navigation">
+      <a href="/index.html">Home</a>
+      <a href="/index.html?type=lost">Lost</a>
+      <a href="/index.html?type=found">Found</a>
+      <a href="/report.html">Report</a>
+      <div id="nav-auth" class="nav-auth"></div>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <div class="auth-shell">
+      <aside class="auth-aside">
+        <div>
+          <span class="auth-badge">New account</span>
+          <h2 class="mt-2">One account, everything in one place</h2>
+          <p>Report items, claim what is yours and follow the recovery from start to finish.</p>
+          <ul>
+            <li>Report lost and found items with a photo</li>
+            <li>Private proof fields — never published</li>
+            <li>Notifications when a match is found</li>
+          </ul>
+        </div>
+        <p class="small" style="margin:0;opacity:.65">Lostly · Campus Lost &amp; Found · Sai University</p>
+      </aside>
+
+      <div class="auth-form">
+        <h1>Create your account</h1>
+        <p class="lead">One account to report items, claim them and track recovery.</p>
+
+        <div id="form-errors" class="hidden"></div>
+
+        <form id="register-form" novalidate>
+          <div class="field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" required minlength="2" maxlength="60" autocomplete="name" placeholder="Arjun Rao">
+          </div>
+          <div class="field">
+            <label for="email">College email</label>
+            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@saiuniversity.edu.in">
+          </div>
+
+          <div class="form-row two">
+            <div class="field">
+              <label for="department">Department / year</label>
+              <input type="text" id="department" name="department" maxlength="60" placeholder="B.Tech CSE - Year 2">
+            </div>
+            <div class="field">
+              <label for="phone">Phone (optional)</label>
+              <input type="tel" id="phone" name="phone" maxlength="20" autocomplete="tel" placeholder="98765 43210">
+            </div>
+          </div>
+
+          <div class="form-row two">
+            <div class="field">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+              <div class="hint">At least 8 characters, with one letter and one number.</div>
+            </div>
+            <div class="field">
+              <label for="confirm">Confirm password</label>
+              <input type="password" id="confirm" name="confirm" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+            </div>
+          </div>
+
+          <button class="btn btn-block btn-lg" type="submit" id="submit-btn">Create account</button>
+        </form>
+
+        <p class="auth-alt">Already registered? <a href="/login.html">Log in</a></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true">L</span>
+          <span>Lostly<small>Campus Lost &amp; Found</small></span>
+        </a>
+        <p class="small" style="margin-top:1rem;max-width:34ch;color:var(--text-muted)">
+          Lost it? Let's get it back. A quieter, verified place for the campus to return what was
+          found — and reclaim what was lost.
+        </p>
+      </div>
+      <div>
+        <h4>Browse</h4>
+        <ul>
+          <li><a href="/index.html">All listings</a></li>
+          <li><a href="/index.html?type=lost">Lost items</a></li>
+          <li><a href="/index.html?type=found">Found items</a></li>
+          <li><a href="/report.html">Report an item</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Your account</h4>
+        <ul>
+          <li><a href="/login.html">Log in</a></li>
+          <li><a href="/register.html">Create account</a></li>
+          <li><a href="/dashboard.html">Dashboard</a></li>
+          <li><a href="/admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Lostly · Campus Lost &amp; Found Portal · Sai University</span>
+      <span>Handovers happen in public campus spaces. Never share OTPs or payment details.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="/js/auth-page.js"></script>
+</body>
+</html>

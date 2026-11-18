@@ -1,0 +1,215 @@
+================================================================
+ CAMPUS LOST AND FOUND PORTAL  --  START HERE
+ Read this file first. Do the steps in order. Do not skip any.
+================================================================
+
+WHAT YOU NEED BEFORE STARTING
+  1. VS Code                (free)  https://code.visualstudio.com
+  2. Node.js LTS            (free)  https://nodejs.org   <- click the big
+                                    "LTS" button, then Next-Next-Finish
+  3. A Supabase database    (free)  see STEP 4 below
+  4. This project folder unzipped somewhere like
+     C:\Users\<yourname>\Documents\campus-lost-found
+
+You do NOT need to install any database on your laptop.
+You will use a free Supabase (PostgreSQL) project instead (STEP 4).
+
+
+----------------------------------------------------------------
+STEP 1 - UNZIP THIS PROJECT
+----------------------------------------------------------------
+  - Right-click campus-lost-found-portal.zip  ->  Extract All  ->  Extract
+  - You now have a folder named "campus-lost-found".
+  - Open that folder. You should see these files:
+        package.json
+        server.js
+        README.md
+        src        (folder)
+        public     (folder)
+  If you see a folder inside a folder, open the inner one.
+  The correct folder is the one that contains package.json.
+
+
+----------------------------------------------------------------
+STEP 2 - OPEN THE FOLDER IN VS CODE
+----------------------------------------------------------------
+  - Open VS Code.
+  - Menu: File  ->  Open Folder...
+  - Select the "campus-lost-found" folder  ->  click "Select Folder"
+  - If VS Code asks "Do you trust the authors?"  ->  click "Yes, I trust".
+
+  In the left sidebar you should now see src, public, docs, package.json.
+
+
+----------------------------------------------------------------
+STEP 3 - OPEN THE TERMINAL AND INSTALL
+----------------------------------------------------------------
+  - Press  Ctrl + `   (the key left of 1, under Esc).
+    A black panel opens at the bottom. This is the terminal.
+  - Type this and press Enter:
+
+        npm install
+
+  - Wait 1-3 minutes. You will see a progress bar and then a folder
+    named "node_modules" appears in the sidebar.
+  - When it finishes you are back at the prompt (a line ending with >).
+  - If you see "npm not found", Node.js is not installed - go back to
+    WHAT YOU NEED item 2, install it, then CLOSE and REOPEN VS Code.
+
+
+----------------------------------------------------------------
+STEP 4 - CREATE YOUR FREE DATABASE (Supabase)
+----------------------------------------------------------------
+  Do this in your web browser, not in VS Code.
+
+  a) Go to  https://www.mongodb.com/cloud/atlas/register
+     Sign up (Google sign-in is fastest). Choose the FREE plan.
+
+  b) Create a cluster:  choose "M0 FREE", any region near India
+     (Mumbai / Singapore), then click "Create Deployment".
+     Wait 1-3 minutes until the cluster is ready.
+
+  c) It asks you to create a database user.
+     Username:  student
+     Password:  click "Autogenerate" and COPY THE PASSWORD somewhere
+                (you need it in step d). Then click Create.
+
+  d) Copy the connection string it shows you. It looks like:
+        mongodb+srv://student:<db_password>@cluster0.ab12c.mongodb.net/?retryWrites=true&w=majority
+     Replace <db_password> with the password you copied.
+     Add the database name "campus_lost_found" before the "?", like this:
+        mongodb+srv://student:MyPass123@cluster0.ab12c.mongodb.net/campus_lost_found?retryWrites=true&w=majority
+     Keep this full string in Notepad - you paste it in STEP 5.
+
+  e) IMPORTANT: on the left menu click
+        Security  ->  Network Access  ->  Add IP Address  ->  "Allow Access
+        from Anywhere"  (0.0.0.0/0)  ->  Confirm
+     If you skip this, the app cannot connect.
+
+
+----------------------------------------------------------------
+STEP 5 - CREATE THE .env FILE
+----------------------------------------------------------------
+  In VS Code:
+  - Click once on the file ".env.example" in the left sidebar.
+  - Menu: Edit -> Select All, then Edit -> Copy  (Ctrl+A, Ctrl+C)
+  - Now create a new file: File -> New Text File
+  - Paste (Ctrl+V).
+  - Save it with the name ".env"  :
+        File -> Save As  ->  type  .env  ->  Save
+    (the file must be named exactly .env, not .env.txt)
+  - In that .env file, find this line:
+
+        DATABASE_URL=postgresql://postgres:password@127.0.0.1:5432/campus_lost_found
+
+    Delete it and paste YOUR Supabase string from STEP 4d instead.
+    So the line becomes:
+
+        DATABASE_URL=postgresql://postgres.abcdefgh:MyPass123@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
+
+  - Also change this line to any long random text you make up:
+
+        JWT_SECRET=change_this_to_a_long_random_secret
+     example:  JWT_SECRET=kj4h5g6f7d8s9a0p1o2i3u4y5t6r7e8w
+
+  - Press Ctrl+S to save.
+
+
+----------------------------------------------------------------
+STEP 6 - CREATE THE TABLES, THEN FILL THEM WITH SAMPLE DATA
+----------------------------------------------------------------
+  In the VS Code terminal (Ctrl + `), type:
+
+        npm run db:setup
+
+  You should see:  [db:setup] schema applied ...
+
+  Then:
+
+        npm run seed
+
+  You should see lines like:
+        [db] PostgreSQL connected (server time ...)
+        [seed] 12 sample items inserted
+        [seed] Done. Demo logins: ...
+
+  If you see "DATABASE_URL is missing" -> your .env file is wrong (STEP 5).
+  If you see "Could not connect" -> check the password inside the string,
+  and make sure you copied the "Session pooler" connection string.
+
+
+----------------------------------------------------------------
+STEP 7 - START THE APP
+----------------------------------------------------------------
+  In the terminal, type:
+
+        npm start
+
+  You should see:
+        [server] Campus Lost & Found running on http://localhost:5000
+
+  Leave this terminal running. Do not close VS Code.
+  Now open your browser (Chrome) and go to:
+
+        http://localhost:5000
+
+  You should see the Campus Lost & Found home page with 12 items.
+
+
+----------------------------------------------------------------
+STEP 8 - LOG IN AND CLICK AROUND (this is your demo)
+----------------------------------------------------------------
+  Click "Log in" (top right) and use:
+
+        Admin    admin@saiuniversity.edu.in   Admin@12345
+        Student  arjun@saiuniversity.edu.in   Password@123
+
+  Then try, in this order:
+    1. Home page: type "bottle" in search, change the filters.
+    2. "Report item": choose "I found it", fill the form, submit.
+       You will see "Possible matches" appear on the right.
+    3. Open any item -> "Claim this item" -> write a reason -> submit.
+    4. Dashboard -> "Claims received" -> Approve or Reject.
+    5. Log out, log in as the admin -> Admin page -> see the charts.
+
+  TO STOP THE APP: click the terminal and press Ctrl + C.
+
+  WHAT THE STATUSES MEAN
+        Pending review  waiting for an admin (only when REQUIRE_MODERATION=true)
+        Active          live, open for recovery
+        Claim requested somebody has claimed it
+        Returned        resolved - the owner got it back
+        Hidden          rejected by a moderator, with a reason
+        Expired         archived
+
+  The API is versioned: every request goes to /api/v1 (the old /api still works).
+
+
+----------------------------------------------------------------
+COMMON PROBLEMS
+----------------------------------------------------------------
+  "npm: command not found"        -> Node.js not installed. Install it,
+                                     then close and reopen VS Code.
+  "Cannot find module 'express'"  -> npm install was not run. Do STEP 3.
+  "DATABASE_URL is missing"       -> .env file missing or not named .env
+  "Could not connect to server"   -> wrong Supabase password, or you copied
+                                     the direct connection instead of the pooler.
+  "relation \"items\" does not exist" -> run  npm run db:setup  first.
+  "EADDRINUSE port 5000"          -> the app is already running in
+                                     another terminal. Press Ctrl+C there.
+  Page shows but no items         -> run  npm run seed  again (STEP 6).
+  Blank page in browser           -> open the browser DevTools (F12)
+                                     -> Console tab, and read the red line.
+
+
+----------------------------------------------------------------
+AFTER IT RUNS
+----------------------------------------------------------------
+  The rest of the project work (GitHub, deployment, report) is
+  explained in Campus_Lost_Found_Build_and_Submission_Guide.docx
+  and in the docs/ folder:
+
+        docs/API.md          every API endpoint
+        docs/TESTING.md      the 18 Postman test cases
+        docs/DEPLOYMENT.md   how to put it online
+================================================================

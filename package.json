@@ -1,0 +1,41 @@
+{
+  "name": "lostly",
+  "version": "4.0.0",
+  "description": "LOSTLY - Campus Lost & Found Portal. Express REST API on Supabase Postgres with an ES6 frontend.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "db:setup": "node scripts/db-setup.js",
+    "seed": "node src/seed.js",
+    "test:smoke": "node scripts/smoke-test.js",
+    "test:db": "node scripts/test-db.js",
+    "test:api": "node scripts/test-api.js"
+  },
+  "keywords": [
+    "express",
+    "postgres",
+    "supabase",
+    "lost-and-found",
+    "rest-api"
+  ],
+  "author": "Kapil Madduri",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.5.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "pg-mem": "^3.0.5"
+  }
+}

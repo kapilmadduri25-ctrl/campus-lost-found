@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "mongodb.mongodb-vscode",
+    "humao.rest-client",
+    "rangav.vscode-thunder-client",
+    "formulahendry.code-runner"
+  ]
+}

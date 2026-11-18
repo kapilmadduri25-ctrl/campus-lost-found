@@ -1,0 +1,8 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "files.eol": "\n",
+  "emmet.includeLanguages": { "javascript": "javascriptreact" },
+  "search.exclude": { "**/node_modules": true },
+  "files.exclude": { "**/.git": true }
+}
