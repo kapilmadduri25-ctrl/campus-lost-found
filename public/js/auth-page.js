@@ -10,6 +10,26 @@ const nextUrl = qs('next') || '/dashboard.html';
 if (isLoggedIn()) window.location.replace(nextUrl);
 
 const errorBox = document.getElementById('form-errors');
+
+/* one-click demo credentials (handy during a demo or viva) */
+const DEMO = {
+  student: { email: 'arjun@saiuniversity.edu.in', password: 'Password@123' },
+  admin: { email: 'admin@saiuniversity.edu.in', password: 'Admin@12345' },
+};
+
+document.querySelectorAll('[data-fill]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const account = DEMO[btn.dataset.fill];
+    const emailField = document.getElementById('email');
+    const passwordField = document.getElementById('password');
+    if (!account || !emailField || !passwordField) return;
+    emailField.value = account.email;
+    passwordField.value = account.password;
+    emailField.dispatchEvent(new Event('input', { bubbles: true }));
+    passwordField.focus();
+  });
+});
+
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 

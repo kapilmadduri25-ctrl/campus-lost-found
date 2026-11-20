@@ -92,9 +92,16 @@
         <p class="auth-alt">New here? <a href="/register.html">Create an account</a></p>
 
         <div class="demo-box">
-          <strong>Demo accounts (after <code>npm run seed</code>)</strong><br>
-          Admin: admin@saiuniversity.edu.in / Admin@12345<br>
-          Student: arjun@saiuniversity.edu.in / Password@123
+          <strong>Demo accounts</strong> — created by <code>npm run seed</code>
+          <div class="row" style="gap:.5rem;margin-top:.7rem">
+            <button type="button" class="btn btn-outline btn-sm" data-fill="student">Fill student login</button>
+            <button type="button" class="btn btn-outline btn-sm" data-fill="admin">Fill admin login</button>
+          </div>
+          <p class="small muted" style="margin:.7rem 0 0">
+            student · arjun@saiuniversity.edu.in / Password@123<br>
+            admin · admin@saiuniversity.edu.in / Admin@12345
+          </p>
+          <p class="small muted" style="margin:.4rem 0 0">Signing in as the admin account adds an <strong>Admin</strong> button to the header.</p>
         </div>
       </div>
     </div>
