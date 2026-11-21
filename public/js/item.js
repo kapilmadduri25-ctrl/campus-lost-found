@@ -122,6 +122,21 @@ function render(item) {
     </div>`;
 
   const claimForm = document.getElementById('claim-form');
+  // "Report this listing" - a student flagging a wrong, abusive or duplicate post
+  const flagBtn = document.querySelector('[data-flag]');
+  if (flagBtn) {
+    flagBtn.addEventListener('click', async () => {
+      const reason = window.prompt('What is wrong with this listing? (wrong item, abusive, duplicate…)', '');
+      if (!reason || reason.trim().length < 5) return;
+      try {
+        await api(`/api/v1/items/${flagBtn.dataset.flag}/flag`, { method: 'POST', body: { reason: reason.trim() } });
+        toast('Thank you — an administrator will review this listing.', 'success');
+      } catch (err) {
+        toast(err.message, 'error');
+      }
+    });
+  }
+
   if (claimForm) {
     claimForm.addEventListener('submit', async (e) => {
       e.preventDefault();

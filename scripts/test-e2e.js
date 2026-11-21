@@ -82,6 +82,8 @@ function check(name, ok, detail = '') {
   const pageErrors = [];
   const failedRequests = [];
 
+  page.on('dialog', (dialog) => dialog.accept('Duplicate of another listing'));
+
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(`${page.url().replace(base, '')}: ${msg.text().slice(0, 200)}`);
   });
@@ -173,6 +175,7 @@ function check(name, ok, detail = '') {
 
   /* ------------------------------------------------- 5. report a found item */
   await go('/report.html?type=found');
+  await poll(async () => (await page.$$eval('#location option', (o) => o.length)) > 1, 8000);
   const reportTitle = await page.$eval('#form-title', (el) => el.textContent).catch(() => '');
   check('the report form opens in "found" mode', /found/i.test(reportTitle), reportTitle);
 
@@ -271,6 +274,117 @@ function check(name, ok, detail = '') {
   check('admin sees the moderation queue', admin.includes('moderation queue'));
   check('admin sees the audit log', admin.includes('audit log'));
   check('admin can export a csv', admin.includes('download csv'));
+
+
+  /* ------------------------------------------- 14. register a new account */
+  await page.evaluate(() => localStorage.clear());
+  await go('/register.html');
+  await type('#name', 'Test Student');
+  await type('#email', `test${Date.now()}@saiuniversity.edu.in`);
+  await type('#password', 'Password@123');
+  await type('#confirm', 'Password@123');
+  await page.click('#submit-btn');
+  await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+  await settle(900);
+  check('registration signs the new user in', page.url().includes('/dashboard.html'), page.url());
+
+  /* --------------------------------------------- 15. edit and delete a listing */
+  await go('/report.html?type=found');
+  await poll(async () => (await page.$$eval('#location option', (o) => o.length)) > 1, 8000);
+  await type('#title', 'Brown Leather Wallet');
+  await type('#description', 'Found a brown leather wallet with a metro card inside, near the bus stop.');
+  await page.select('#category', 'Wallet & Cards');
+  await page.select('#location', 'Bus Stop');
+  await page.$eval('#dateLostOrFound', (el) => { el.value = '2026-11-17'; });
+  await page.click('#accuracy').catch(() => {});
+  await page.click('#submit-btn');
+  const created = await poll(async () => {
+    const t = await page.evaluate(() => document.body.innerText);
+    return /report submitted|submitted|saved/i.test(t);
+  }, 9000);
+  check('a new listing is created', created, (await text()).slice(-120));
+
+  await go('/dashboard.html');
+  await poll(async () => (await page.$$eval('#panel-listings [data-edit], #panel-listings a[href*="report.html?id="]', (e) => e.length)) > 0, 9000);
+  const editLink = await page.$('#panel-listings a[href*="report.html?id="]');
+  check('the dashboard offers an edit link', Boolean(editLink));
+  if (editLink) {
+    await editLink.click();
+    await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+    const prefilled = await poll(async () => (await page.$eval('#title', (el) => el.value).catch(() => '')).length > 0, 8000)
+      .then(() => page.$eval('#title', (el) => el.value).catch(() => ''));
+    check('the edit form is pre-filled', prefilled.includes('Brown Leather'), prefilled);
+    await type('#title', 'Brown Leather Wallet (found at bus bay)');
+    await page.click('#submit-btn');
+    const edited = await poll(async () => {
+      const t = await page.evaluate(() => document.body.innerText);
+      return /saved|updated|submitted/i.test(t);
+    }, 9000);
+    check('editing a listing saves', edited, (await text()).slice(-120));
+  }
+
+  /* --------------------------------------------- 16. flag someone else's listing */
+  await page.evaluate(() => localStorage.clear());
+  await go('/login.html');
+  await type('#email', 'meera@saiuniversity.edu.in');
+  await type('#password', 'Password@123');
+  await page.click('#submit-btn');
+  await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+  await go(`/item.html?id=${laptop._id}`);
+  await poll(async () => (await page.$('#detail-root .detail-grid')) !== null, 9000);
+  const flagBtn = await poll(async () => (await page.$('[data-flag]')) !== null, 8000);
+  check('a visitor can see the report-listing control', flagBtn);
+  if (flagBtn) {
+    await page.click('[data-flag]');
+    const flagged = await poll(async () => {
+      const t = await page.evaluate(() => document.body.innerText);
+      return /review|thank/i.test(t);
+    }, 8000);
+    check('flagging a listing is confirmed', flagged, (await text()).slice(0, 120));
+  }
+
+  /* --------------------------------------------- 17. the full reset flow */
+  await page.evaluate(() => localStorage.clear());
+  await go('/forgot-password.html');
+  await type('#email', 'meera@saiuniversity.edu.in');
+  await page.click('#submit-btn');
+  const resetLink = await poll(async () => (await page.$('#reset-result a[href*="token="]')) !== null, 9000);
+  check('the reset request produces a link', resetLink, (await text()).slice(0, 140));
+  if (resetLink) {
+    await page.click('#reset-result a[href*="token="]');
+    await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+    const tokenFilled = await poll(async () => (await page.$eval('#token', (el) => el.value).catch(() => '')).length > 20, 8000)
+      .then(() => page.$eval('#token', (el) => el.value).catch(() => ''));
+    check('the reset page receives the token', tokenFilled.length > 20, `${tokenFilled.length} chars`);
+    await type('#password', 'NewPassword@1');
+    await type('#confirm', 'NewPassword@1');
+    await page.click('#submit-btn');
+    await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+    await settle(700);
+    check('resetting redirects to the login page', page.url().includes('/login.html'), page.url());
+    await type('#email', 'meera@saiuniversity.edu.in');
+    await type('#password', 'NewPassword@1');
+    await page.click('#submit-btn');
+    await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+    await settle(700);
+    check('the new password works in the browser', page.url().includes('/dashboard.html'), page.url());
+  }
+
+  /* --------------------------------------------- 18. admin hides a listing */
+  await page.evaluate(() => localStorage.clear());
+  await go('/login.html');
+  await type('#email', 'admin@saiuniversity.edu.in');
+  await type('#password', 'Admin@12345');
+  await page.click('#submit-btn');
+  await page.waitForNavigation({ waitUntil: 'networkidle2' }).catch(() => {});
+  await poll(async () => (await page.$eval('#admin-root', (e) => e.innerText).catch(() => '')).length > 200, 12000);
+  const hideBtn = await page.$('[data-status]');
+  check('the admin table offers a status control', Boolean(hideBtn));
+  if (hideBtn) {
+    await hideBtn.click();
+    await settle(1200);
+    check('changing a status from the admin table does not throw', pageErrors.length === 0, pageErrors.slice(0, 2).join(' | '));
+  }
 
   /* --------------------------------------------------- 11. public pages */
   for (const [path, needle, label] of [

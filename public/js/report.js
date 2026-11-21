@@ -17,6 +17,11 @@ if (requireLogin()) {
   const form = document.getElementById('report-form');
   const errorBox = document.getElementById('form-errors');
   const submitBtn = document.getElementById('submit-btn');
+
+  // the category and location lists arrive from /meta; a fast submit would otherwise
+  // fail validation with "choose a location" even though one was picked
+  submitBtn.disabled = true;
+  const readyLabel = submitBtn.textContent;
   const typeInput = document.getElementById('type');
   const matchesBox = document.getElementById('matches');
   const descEl = document.getElementById('description');
@@ -52,6 +57,7 @@ if (requireLogin()) {
       const meta = await api('/api/v1/meta');
       const catSel = document.getElementById('category');
       const locSel = document.getElementById('location');
+      submitBtn.disabled = false;
       meta.categories.forEach((c) => catSel.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`));
       meta.locations.forEach((l) => locSel.insertAdjacentHTML('beforeend', `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`));
     } catch (err) {
