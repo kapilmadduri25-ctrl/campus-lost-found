@@ -29,7 +29,7 @@ and aligned with the Campus Lost & Found Portal blueprint (privacy, moderation a
 | Admin: statistics and charts, **moderation queue**, hide/reject **with a reason**, user suspension, **audit log** | `public/admin.html`, `src/controllers/adminController.js` |
 | Duplicate / possible-match alerts + notification centre | `src/utils/findMatches.js` |
 | 13 sample records, 4 users, 1 claim, audit entries | `src/seed.js` |
-| 27 Postman requests / 45+ assertions | `postman/` |
+| 30 Postman requests / 55+ assertions | `postman/` |
 
 ### Item lifecycle
 
@@ -95,7 +95,7 @@ lostly/
 │   ├── js/                      # api, ui, common, home, auth-page, report, item,
 │   │                            #   dashboard, admin, page
 │   └── uploads/
-├── postman/                     # collection (27 requests) + environment
+├── postman/                     # collection (30 requests) + environment
 ├── docs/                        # API, TESTING, DEPLOYMENT, BLUEPRINT_RECONCILIATION
 └── scripts/smoke-test.js
 ```
