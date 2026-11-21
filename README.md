@@ -85,7 +85,8 @@ lostly/
 │   └── seed.js
 ├── public/
 │   ├── index.html  login.html  register.html  report.html
-│   ├── forgot-password.html  reset-password.html
+│   ├── forgot-password.html  reset-password.html  profile.html
+│   ├── help.html  privacy.html
 │   ├── item.html  dashboard.html  admin.html  404.html
 │   ├── css/                     # layered design system (cream, ink, forest, gold)
 │   │   ├── tokens.css           #   colour, type, space, depth (light + dark)

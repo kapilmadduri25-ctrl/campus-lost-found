@@ -94,9 +94,26 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Password updated. You can sign in now.' });
 });
 
+/** PATCH /api/v1/auth/me/password  { currentPassword, newPassword } */
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) throw new ApiError(400, 'Your current and new password are both required');
+  if (String(newPassword).length < 8) throw new ApiError(400, 'The new password must be at least 8 characters');
+  if (currentPassword === newPassword) throw new ApiError(400, 'The new password must be different from the current one');
+
+  const row = await users.findUserForLogin(req.user.email);
+  if (!row) throw new ApiError(404, 'Account not found');
+  if (!(await bcrypt.compare(String(currentPassword), row.password))) {
+    throw new ApiError(401, 'Your current password is not correct');
+  }
+
+  await users.updatePassword(row.id, await bcrypt.hash(String(newPassword), 10));
+  res.json({ success: true, message: 'Password changed. Use the new one next time you sign in.' });
+});
+
 /** POST /api/v1/auth/logout - protected (stateless JWT: the client drops the token) */
 const logout = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-module.exports = { register, login, getMe, updateMe, logout, forgotPassword, resetPassword };
+module.exports = { register, login, getMe, updateMe, logout, forgotPassword, resetPassword, changePassword };

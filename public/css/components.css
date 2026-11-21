@@ -777,3 +777,13 @@ tbody tr:hover { background: var(--surface-2); }
 }
 .pw-toggle:hover { background: var(--accent-soft); }
 .pw-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.nav-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--danger);
+  vertical-align: middle;
+}

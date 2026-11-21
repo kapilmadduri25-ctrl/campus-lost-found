@@ -118,7 +118,10 @@ function render(statsRes, itemsRes, queueRes, claimsRes, usersRes, auditRes) {
       </table>
     </div>
 
-    <h2 class="mt-3" style="font-size:1.2rem">All listings</h2>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2 class="mt-3" style="font-size:1.2rem">All listings</h2>
+      <button type="button" class="btn btn-outline btn-sm" id="export-csv">Download CSV</button>
+    </div>
     <p class="small muted" style="margin:0 0 .5rem">Showing ${items.length} of ${itemsRes.total} listings, newest first</p>
     <div class="table-wrap">
       <table>

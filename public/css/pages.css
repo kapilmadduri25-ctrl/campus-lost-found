@@ -147,3 +147,46 @@
   body { background: #fff; color: #000; }
   .card, .table-wrap { box-shadow: none; border-color: #ccc; }
 }
+
+/* ------------------------------ help page ------------------------------ */
+.faq { display: grid; gap: 0.6rem; max-width: 62rem; }
+.faq details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.95rem 1.1rem;
+  box-shadow: var(--shadow-xs);
+}
+.faq details[open] { box-shadow: var(--shadow-sm); }
+.faq summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--text-base);
+  color: var(--text);
+  list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::before {
+  content: "+";
+  display: inline-block;
+  width: 1.1rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+.faq details[open] summary::before { content: "–"; }
+.faq summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-sm); }
+.faq p { margin: 0.7rem 0 0; color: var(--text-soft); font-size: var(--text-sm); line-height: 1.65; }
+
+/* ----------------------------- privacy page ---------------------------- */
+.prose { max-width: 62rem; }
+.prose h2 { font-size: 1.05rem; margin: 1.4rem 0 0.4rem; }
+.prose h2:first-child { margin-top: 0; }
+.prose p, .prose li { color: var(--text-soft); font-size: var(--text-sm); line-height: 1.7; }
+.prose ul { margin: 0.4rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--surface-3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}

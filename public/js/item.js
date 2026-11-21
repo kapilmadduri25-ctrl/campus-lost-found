@@ -115,6 +115,9 @@ function render(item) {
           <h2 style="font-size:1.05rem">${item.claimsCount || 0} claim${item.claimsCount === 1 ? '' : 's'} so far</h2>
           <p class="small muted" style="margin:0">${isAdmin() ? 'As an admin you can review every claim from the admin dashboard.' : 'Claim details are private to the person who posted the item.'}</p>
         </div>
+        <p class="small muted" style="margin:.9rem 0 0">
+          <button type="button" class="linklike" data-flag="${item._id}">Report this listing</button>
+        </p>
       </aside>
     </div>`;
 

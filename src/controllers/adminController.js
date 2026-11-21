@@ -1,4 +1,5 @@
 const items = require('../db/items');
+const flags = require('../db/flags');
 const claims = require('../db/claims');
 const users = require('../db/users');
 const notifications = require('../db/notifications');
@@ -47,7 +48,10 @@ const getAllItems = asyncHandler(async (req, res) => {
   const statuses = req.query.status ? [req.query.status] : items.ALL_STATUSES;
   const { items: rows, total } = await items.findItems({ statuses, type: req.query.type, page, limit, sort: 'newest' });
 
-  res.json({ success: true, total, page, pages: Math.ceil(total / limit) || 1, items: rows });
+  const counts = await flags.countsForItems(rows.map((r) => r._id));
+  const withFlags = rows.map((r) => ({ ...r, flagCount: counts[r._id] || 0 }));
+
+  res.json({ success: true, total, page, pages: Math.ceil(total / limit) || 1, items: withFlags });
 });
 
 /** GET /api/v1/admin/reports?status=pending — the moderation queue. */

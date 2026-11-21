@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lostly — the campus lost &amp; found portal. Log in to the Campus Lost and Found Portal.">
+  <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+  <title>Privacy · Lostly</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-family='system-ui,sans-serif' font-size='28' font-weight='700' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/pages.css">
+  <script>
+    // apply the saved colour theme before first paint, so there is no flash
+    (function () {
+      try {
+        var saved = localStorage.getItem('clf_theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/index.html">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span>Lostly<small>Campus Lost &amp; Found</small></span>
+    </a>
+
+    <div class="header-tools">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme" title="Switch between light and dark">
+        <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+        <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+      </button>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+        <span aria-hidden="true">☰</span><span class="nav-toggle-label">Menu</span>
+      </button>
+    </div>
+
+    <nav class="nav" id="main-nav" aria-label="Main navigation">
+      <a href="/index.html">Home</a>
+      <a href="/index.html?type=lost">Lost</a>
+      <a href="/index.html?type=found">Found</a>
+      <a href="/report.html">Report</a>
+      <div id="nav-auth" class="nav-auth"></div>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+    <div class="page-head">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/index.html">Home</a><span aria-hidden="true">/</span><span>Privacy</span></nav>
+      <h1>Privacy</h1>
+      <p class="lead">What this portal stores, who can see it, and how long it stays.</p>
+    </div>
+
+    <div class="prose card card-pad">
+      <h2>What is stored</h2>
+      <ul>
+        <li><strong>Your account:</strong> name, college email, hashed password, optional department and phone.</li>
+        <li><strong>Your listings:</strong> the public description, category, place, date, optional photo, plus the private
+        details you chose to add.</li>
+        <li><strong>Claims:</strong> the message and proof you send to the person holding the item.</li>
+        <li><strong>Audit trail:</strong> who moderated or changed what, when, and the reason given.</li>
+      </ul>
+
+      <h2>What other students can see</h2>
+      <p>Your display name, the listing details and its status. They never see your email address, your phone number, your
+      department, the private details of a listing, or the contents of any claim you did not make.</p>
+
+      <h2>What administrators can see</h2>
+      <p>Everything above, plus the moderation history, so they can resolve disputes and act on reports. Passwords are
+      stored only as a one-way bcrypt hash — nobody, including an administrator, can read them.</p>
+
+      <h2>How long it is kept</h2>
+      <p>Open listings are archived automatically after 90 days. Resolved listings stay for the record until deleted.
+      Password reset tokens expire after 30 minutes and are stored only as a hash. You can ask an administrator to delete
+      your account and everything attached to it.</p>
+
+      <h2>Cookies and storage</h2>
+      <p>There are no advertising or analytics cookies. The browser stores your sign-in token and your light/dark theme
+      preference in <code>localStorage</code>; clearing site data signs you out.</p>
+
+      <h2>Questions</h2>
+      <p>Speak to the project guide or the campus administrator. This page describes a student project and is not legal advice.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true">L</span>
+          <span>Lostly<small>Campus Lost &amp; Found</small></span>
+        </a>
+        <p class="small" style="margin-top:1rem;max-width:34ch;color:var(--text-muted)">
+          Lost it? Let's get it back. A quieter, verified place for the campus to return what was
+          found — and reclaim what was lost.
+        </p>
+      </div>
+      <div>
+        <h4>Browse</h4>
+        <ul>
+          <li><a href="/index.html">All listings</a></li>
+          <li><a href="/index.html?type=lost">Lost items</a></li>
+          <li><a href="/index.html?type=found">Found items</a></li>
+          <li><a href="/report.html">Report an item</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Your account</h4>
+        <ul>
+          <li><a href="/login.html">Log in</a></li>
+          <li><a href="/register.html">Create account</a></li>
+          <li><a href="/dashboard.html">Dashboard</a></li>
+          <li><a href="/admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Lostly · Campus Lost &amp; Found Portal · Sai University</span>
+      <span class="small"><a href="/help.html">Help</a> · <a href="/privacy.html">Privacy</a> · Handovers happen in public campus spaces. Never share OTPs or payment details.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="/js/auth-page.js"></script>
+</body>
+</html>

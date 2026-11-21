@@ -8,6 +8,7 @@ const {
   updateStatus,
   deleteItem,
   getMyItems,
+  flagItem,
 } = require('../controllers/itemController');
 const { protect } = require('../middleware/auth');
 const optionalAuth = require('../middleware/optionalAuth');
@@ -33,6 +34,7 @@ router.get('/:id', optionalAuth, getItemById);
 
 router.post('/', protect, writeLimiter, upload.single('image'), upload.cleanupOnFailure, validateItem, createItem);
 router.patch('/:id', protect, upload.single('image'), upload.cleanupOnFailure, validateItemUpdate, updateItem);
+router.post('/:id/flag', protect, flagItem);
 router.patch('/:id/status', protect, updateStatus);
 router.delete('/:id', protect, deleteItem);
 

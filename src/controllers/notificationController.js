@@ -24,4 +24,11 @@ const markAllRead = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'All notifications marked as read' });
 });
 
-module.exports = { getMyNotifications, markRead, markAllRead };
+/** GET /api/v1/notifications/unread - the little badge in the header. */
+const getUnreadCount = asyncHandler(async (req, res) => {
+  const count = await notifications.unreadCount(req.user._id);
+  res.json({ success: true, count });
+});
+
+module.exports = {
+  getUnreadCount, getMyNotifications, markRead, markAllRead };

@@ -342,6 +342,57 @@ process.env.REQUIRE_MODERATION = 'false';
     const reuse = await call('POST', '/api/v1/auth/reset-password', { body: { token: forgot.json.devToken, password: 'Another@1234' } });
     check('a reset token cannot be used twice', reuse.status === 400);
 
+    /* ---------------- account settings and abuse reporting ------------ */
+    const wrongCurrent = await call('PATCH', '/api/v1/auth/me/password', {
+      token, body: { currentPassword: 'not-my-password', newPassword: 'BrandNew@123' },
+    });
+    check('changing password with a wrong current password is 401', wrongCurrent.status === 401);
+
+    const shortNew = await call('PATCH', '/api/v1/auth/me/password', {
+      token, body: { currentPassword: 'Password@123', newPassword: 'short' },
+    });
+    check('a new password under 8 characters is rejected', shortNew.status === 400);
+
+    const changed = await call('PATCH', '/api/v1/auth/me/password', {
+      token, body: { currentPassword: 'Password@123', newPassword: 'BrandNew@123' },
+    });
+    check('a correct current password changes it', changed.status === 200);
+
+    const loginWithNew = await call('POST', '/api/v1/auth/login', {
+      body: { email: 'arjun@saiuniversity.edu.in', password: 'BrandNew@123' },
+    });
+    check('the changed password works', loginWithNew.status === 200);
+
+    const updatedProfile = await call('PATCH', '/api/v1/auth/me', {
+      token, body: { name: 'Arjun Rao', department: 'Computer Science', phone: '9000000000' },
+    });
+    check('profile details can be updated', updatedProfile.status === 200 && updatedProfile.json.user.department === 'Computer Science');
+
+    const flagOwn = await call('POST', `/api/v1/items/${itemId}/flag`, { token, body: { reason: 'testing my own listing' } });
+    check('cannot flag your own listing', flagOwn.status === 400);
+
+    const flag = await call('POST', `/api/v1/items/${id3}/flag`, {
+      token: rahulToken, body: { reason: 'This looks like a duplicate of another umbrella post' },
+    });
+    check('a student can flag someone else\'s listing', flag.status === 201);
+
+    const flagAgain = await call('POST', `/api/v1/items/${id3}/flag`, {
+      token: rahulToken, body: { reason: 'Trying to flag the same listing twice' },
+    });
+    check('the same student cannot flag twice', flagAgain.status === 409);
+
+    const shortFlag = await call('POST', `/api/v1/items/${id3}/flag`, {
+      token: meeraToken, body: { reason: 'x' },
+    });
+    check('a one-character flag reason is rejected', shortFlag.status === 401 || shortFlag.status === 400);
+
+    const unread = await call('GET', '/api/v1/notifications/unread', { token });
+    check('the unread badge endpoint returns a count', unread.status === 200 && typeof unread.json.count === 'number');
+
+    const adminItems = await call('GET', '/api/v1/admin/items', { token: adminToken });
+    check('admin listing rows carry a flag count',
+      adminItems.status === 200 && adminItems.json.items.some((i) => typeof i.flagCount === 'number'));
+
   } catch (err) {
     fail += 1;
     console.log(`FAIL  unexpected error: ${err.message}`);

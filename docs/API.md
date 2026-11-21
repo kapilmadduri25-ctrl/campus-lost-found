@@ -44,6 +44,10 @@ Errors: `400` validation, `409` email already registered.
 Body: `email`, `password` → `200` with `token` + `user`, or `401` for wrong credentials.
 A suspended account (`isActive:false`) gets `403`.
 
+### PATCH /auth/me/password
+Body: `currentPassword`, `newPassword` (≥ 8 characters, must differ). Verifies the current password
+before changing it; `401` if it is wrong.
+
 ### POST /auth/forgot-password
 Body: `email`. Always returns `200` with the same message, so the endpoint cannot be used to
 discover which addresses have accounts. Creates a single-use token valid for 30 minutes; in
@@ -118,6 +122,11 @@ Owner or admin. Editable: `title`, `description`, `descriptionPrivate`, `categor
 ### PATCH /items/:id/status
 Body `{ "status": "…" }`. Owner may do `active`/`claim_requested → resolved` and `resolved → active`;
 an admin may set any status. Every change is audited.
+
+### POST /items/:id/flag
+Body: `reason` (≥ 5 characters). Any signed-in student except the reporter can flag a listing as wrong,
+abusive or duplicate. One flag per user per listing (`409` on a repeat). Flags never change the listing —
+an administrator reviews them from the moderation queue, where the count appears on each row.
 
 ### DELETE /items/:id
 Owner or admin. Removes the listing, its claims, notifications and image file; writes an audit entry.

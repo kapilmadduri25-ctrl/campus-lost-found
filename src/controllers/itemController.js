@@ -8,6 +8,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { findPossibleMatches } = require('../utils/findMatches');
 const { withTransaction } = require('../config/db');
 const { mapItem } = require('../db/mappers');
+const flags = require('../db/flags');
 const { record } = require('../utils/audit');
 
 // what an anonymous visitor may see in search results
@@ -252,6 +253,33 @@ const updateStatus = asyncHandler(async (req, res) => {
   res.json({ success: true, message: `Status updated to ${status}`, item: withoutPrivate(item) });
 });
 
+/**
+ * POST /api/v1/items/:id/flag  { reason }
+ * A student reports a listing as wrong, abusive or a duplicate. Flags never change the
+ * listing themselves - an admin reviews them from the moderation queue.
+ */
+const flagItem = asyncHandler(async (req, res) => {
+  const reason = String(req.body.reason || '').trim();
+  if (reason.length < 5) throw new ApiError(400, 'Please say briefly what is wrong with this listing');
+
+  const item = await items.findItemById(req.params.id);
+  if (!item) throw new ApiError(404, 'Item not found');
+  if (String(item.reporter?._id) === String(req.user._id)) {
+    throw new ApiError(400, 'You cannot report your own listing');
+  }
+
+  await flags.create({ itemId: item._id, userId: req.user._id, reason });
+  await record(req, {
+    action: 'item.flagged',
+    entityType: 'item',
+    entityId: item._id,
+    reason,
+    metadata: { itemTitle: item.title },
+  });
+
+  res.status(201).json({ success: true, message: 'Thank you - an administrator will review this listing.' });
+});
+
 /** DELETE /api/v1/items/:id — owner or admin. Claims and notifications cascade. */
 const deleteItem = asyncHandler(async (req, res) => {
   const item = await items.findItemById(req.params.id);
@@ -294,4 +322,5 @@ const getMyItems = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getItems, getItemById, createItem, updateItem, updateStatus, deleteItem, getMyItems };
+module.exports = {
+  flagItem, getItems, getItemById, createItem, updateItem, updateStatus, deleteItem, getMyItems };

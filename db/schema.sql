@@ -122,3 +122,17 @@ create table if not exists password_resets (
 );
 create index if not exists password_resets_token_idx on password_resets (token_hash);
 create index if not exists password_resets_user_idx on password_resets (user_id);
+
+-- ---------------------------------------------------------------------------
+-- item_flags : a student reporting a listing as wrong, abusive or a duplicate.
+-- One flag per user per listing; admins see the count in the listing table.
+-- ---------------------------------------------------------------------------
+create table if not exists item_flags (
+  id uuid primary key,
+  item_id uuid not null references items(id) on delete cascade,
+  user_id uuid not null references users(id) on delete cascade,
+  reason text not null,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists item_flags_unique on item_flags (item_id, user_id);
+create index if not exists item_flags_item_idx on item_flags (item_id);

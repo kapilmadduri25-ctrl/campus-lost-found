@@ -73,8 +73,19 @@ export function mountHeader() {
     slot.innerHTML = `
       <span class="nav-user">${escape(user.name.split(' ')[0])}${isAdmin() ? ' · admin' : ''}</span>
       <a href="/dashboard.html">Dashboard</a>
+      <a href="/profile.html">Profile</a>
       ${isAdmin() ? '<a href="/admin.html">Admin</a>' : ''}
       <button type="button" class="linklike" id="logout-btn">Log out</button>`;
+    // a quiet dot when there are unread alerts
+    api('/api/v1/notifications/unread')
+      .then(({ count }) => {
+        const dash = slot.querySelector('a[href="/dashboard.html"]');
+        if (count > 0 && dash) {
+          dash.insertAdjacentHTML('beforeend', ' <span class="nav-dot" aria-label="unread alerts" title="Unread alerts"></span>');
+        }
+      })
+      .catch(() => {});
+
     slot.querySelector('#logout-btn')?.addEventListener('click', () => {
       clearSession();
       window.location.href = '/index.html';
