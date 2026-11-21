@@ -121,6 +121,7 @@ lostly/
 | Create the tables | `npm run db:setup` (safe to run again) |
 | Seed / reseed | **F5** → *Seed database*, or `npm run seed -- --reset` |
 | Archive stale listings | `npm run expire` (or a Render cron job — see `docs/DEPLOYMENT.md`) |
+| Password-reset email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`, `APP_URL` (Brevo works out of the box — see `docs/DEPLOYMENT.md`) |
 | Schema | applied automatically on every boot (`migrate()` in `src/config/db.js`), or `npm run db:setup` by hand |
 | Quick check without a database | **F5** → *Smoke test (no database)* |
 | Browse the database | Supabase dashboard → Table editor (or the SQL editor) |

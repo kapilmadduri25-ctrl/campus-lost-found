@@ -36,6 +36,33 @@ async function sendPasswordReset({ to, name, token, appUrl }) {
   if (!mailer) return false;
 
   const link = `${appUrl || process.env.APP_URL || 'http://localhost:5000'}/reset-password.html?token=${encodeURIComponent(token)}`;
+
+  try {
+    await send(mailer, { to, name, link });
+  } catch (err) {
+    throw new Error(explain(err));
+  }
+  return true;
+}
+
+/** Turns an SMTP failure into the sentence the person setting it up needs to read. */
+function explain(err) {
+  const code = err.code || '';
+  const text = String(err.response || err.message || '');
+
+  if (code === 'EAUTH' || /535|Invalid login|authentication failed/i.test(text)) {
+    return `${err.message} - the SMTP login is the one Brevo shows on the SMTP tab (usually something@smtp-brevo.com), and the password must be an SMTP key, not your Brevo account password.`;
+  }
+  if (/550|sender|from address/i.test(text)) {
+    return `${err.message} - Brevo only sends from a verified sender: add this address under Senders, click the link in the confirmation email, then try again.`;
+  }
+  if (code === 'ETIMEDOUT' || code === 'ECONNECTION' || code === 'ESOCKET') {
+    return `${err.message} - the port is unreachable. Try SMTP_PORT=587, then 2525.`;
+  }
+  return err.message;
+}
+
+async function send(mailer, { to, name, link }) {
   await mailer.sendMail({
     from: process.env.MAIL_FROM || process.env.SMTP_USER,
     to,

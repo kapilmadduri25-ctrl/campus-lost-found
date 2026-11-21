@@ -9,6 +9,11 @@ const PORT = process.env.PORT || 5000;
     await connectDB();
     await migrate(); // idempotent: keeps the deployed schema in step with the code
 
+    const mailer = require('./src/utils/mailer');
+    console.log(mailer.isConfigured()
+      ? `[mail] SMTP ready via ${process.env.SMTP_HOST} - reset links will be emailed`
+      : '[mail] no SMTP configured - reset links are written to this log only');
+
     const server = app.listen(PORT, () => {
       console.log(`[server] LOSTLY running on http://localhost:${PORT}`);
     });

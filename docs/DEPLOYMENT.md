@@ -150,6 +150,74 @@ Without a cron job the command can be run by hand from the service **Shell** onc
 
 ---
 
+## Optional: real password-reset emails (Brevo)
+
+Free tier: **300 messages a day**, no card. About five minutes.
+
+### 1. Create the account and verify a sender
+
+1. Sign up at <https://www.brevo.com> and confirm your email.
+2. **Senders, Domains & Dedicated IPs -> Senders -> Add a sender.** Use the address you want
+   the mail to come *from* (your Gmail is fine). Brevo emails a confirmation link — click it.
+   Without this step every send is refused with `550`.
+
+### 2. Get the SMTP credentials
+
+3. **SMTP & API -> SMTP tab.** Copy the two values shown there:
+   * **Login** — looks like `9a1b2c001@smtp-brevo.com`, *not* your account email.
+   * **SMTP key** — click *Generate a new SMTP key*. This is the password. Your account
+     password will not work.
+
+### 3. Put them in `.env` locally
+
+```
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USER=9a1b2c001@smtp-brevo.com
+SMTP_PASS=xkeysib-...your-smtp-key...
+MAIL_FROM=the.address.you.verified@gmail.com
+APP_URL=http://localhost:5000
+```
+
+### 4. Prove it before deploying
+
+```bash
+npm run mail:test -- the.address.you.verified@gmail.com
+```
+
+A success prints `test message accepted`. If it fails, the message now says which of the three
+usual causes it is: wrong login, unverified sender, or a blocked port (then try `2525`).
+
+### 5. Add the same six variables on Render
+
+Render -> your service -> **Environment** -> add the six keys with
+`APP_URL=https://lostly-3r3f.onrender.com`, then **Manual Deploy -> Deploy latest commit**.
+The startup log will read:
+
+```
+[mail] SMTP ready via smtp-relay.brevo.com - reset links will be emailed
+```
+
+From then on `GET /api/v1/meta` returns `emailEnabled: true`, the notice disappears from the
+forgot-password page, and the link arrives by email instead of being logged.
+
+### Any other provider
+
+## Keeping the board tidy
+
+`npm run expire` archives anything still open after `LISTING_TTL_DAYS` (default 90) and rejects its
+outstanding claims. On Render, add a **Cron Job** pointing at the same repository:
+
+| Field | Value |
+|---|---|
+| Command | `npm run expire` |
+| Schedule | `0 3 * * 1` (every Monday, 03:00) |
+| Environment | the same `DATABASE_URL` |
+
+Without a cron job the command can be run by hand from the service **Shell** once a term.
+
+---
+
 ## Optional: real password-reset emails
 
 The forgot-password flow works without any email account, but then it can only log the token
