@@ -141,7 +141,12 @@ if (requireLogin()) {
                     <td class="small">${escapeHtml(c.message)}${c.decisionNote ? `<div class="small muted">Note: ${escapeHtml(c.decisionNote)}</div>` : ''}</td>
                     <td>${claimBadge(c.status)}</td>
                     <td class="small muted">${formatDate(c.createdAt)}</td>
-                    <td>${c.status === 'pending' ? `<button class="btn btn-outline btn-sm" data-withdraw="${c._id}">Withdraw</button>` : ''}</td>
+                    <td>
+                      <div class="row-actions">
+                        ${c.status === 'info_requested' ? `<button class="btn btn-sm" data-reply="${c._id}">Reply with details</button>` : ''}
+                        ${c.status === 'pending' ? `<button class="btn btn-outline btn-sm" data-withdraw="${c._id}">Withdraw</button>` : ''}
+                      </div>
+                    </td>
                   </tr>`
                 )
                 .join('')}
@@ -155,6 +160,21 @@ if (requireLogin()) {
   }
 
   panels.claims.addEventListener('click', async (e) => {
+    const replyBtn = e.target.closest('[data-reply]');
+    if (replyBtn) {
+      const text = window.prompt('Add the details the finder asked for (at least 10 characters):', '');
+      if (!text) return;
+      try {
+        await api(`/api/v1/claims/${replyBtn.dataset.reply}/reply`, { method: 'PATCH', body: { message: text } });
+        toast('Reply sent to the finder', 'success');
+        loadMyClaims();
+        loadStats();
+      } catch (err) {
+        toast(err.message, 'error');
+      }
+      return;
+    }
+
     const btn = e.target.closest('[data-withdraw]');
     if (!btn) return;
     if (!window.confirm('Withdraw this claim?')) return;
@@ -244,7 +264,7 @@ if (requireLogin()) {
         </div>
         ${notifications
           .map(
-            (n) => `<div class="notif ${n.read ? 'read' : 'unread'}">
+            (n) => `<div class="notif ${n.read ? 'read' : 'unread'}" data-notif="${n._id}" role="button" tabindex="0">
               <span class="notif-dot" aria-hidden="true"></span>
               <div style="flex:1">
                 <div class="small" style="font-weight:600">${escapeHtml(n.message)}</div>
@@ -253,6 +273,25 @@ if (requireLogin()) {
             </div>`
           )
           .join('')}`;
+
+      panels.notifications.querySelectorAll('[data-notif]').forEach((el) => {
+        const markRead = async (event) => {
+          if (event.target.closest('a')) return; // let the item link work
+          if (el.classList.contains('read')) return;
+          try {
+            await api(`/api/v1/notifications/${el.dataset.notif}/read`, { method: 'PATCH' });
+            el.classList.remove('unread');
+            el.classList.add('read');
+            loadStats();
+          } catch {
+            /* cosmetic only */
+          }
+        };
+        el.addEventListener('click', markRead);
+        el.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') markRead(event);
+        });
+      });
 
       document.getElementById('mark-all')?.addEventListener('click', async () => {
         await api('/api/v1/notifications/read-all', { method: 'PATCH' });

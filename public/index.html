@@ -121,6 +121,27 @@
         <button class="btn" type="submit">Search</button>
       </div>
 
+      <div class="row mt-2" style="gap:.55rem">
+        <div style="flex:1 1 150px">
+          <label class="sr-only" for="filter-from">From date</label>
+          <input type="date" id="filter-from" name="from" aria-label="From date">
+        </div>
+        <div style="flex:1 1 150px">
+          <label class="sr-only" for="filter-to">To date</label>
+          <input type="date" id="filter-to" name="to" aria-label="To date">
+        </div>
+        <div style="flex:1 1 170px">
+          <label class="sr-only" for="filter-status">Status</label>
+          <select id="filter-status" name="status" aria-label="Status">
+            <option value="">Any status</option>
+            <option value="active">Active</option>
+            <option value="claim_requested">Claim requested</option>
+            <option value="resolved">Returned</option>
+          </select>
+        </div>
+        <button class="btn btn-outline" type="button" id="reset-filters">Reset filters</button>
+      </div>
+
       <div class="row mt-2">
         <span class="small muted">Popular:</span>
         <div class="chip-row" id="quick-chips"></div>

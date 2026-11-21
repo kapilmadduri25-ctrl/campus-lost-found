@@ -131,6 +131,47 @@ const decideClaim = asyncHandler(async (req, res) => {
   res.json({ success: true, message: `Claim ${status.replace('_', ' ')}`, claim: decided });
 });
 
+/**
+ * PATCH /api/v1/claims/:id/reply — the claimant answers a request for more
+ * information. Only valid while the owner has asked (status info_requested);
+ * the claim returns to pending so the owner can decide again.
+ */
+const replyToInfoRequest = asyncHandler(async (req, res) => {
+  const { message, proof } = req.body;
+  if (!message || String(message).trim().length < 10) {
+    throw new ApiError(400, 'Please give at least 10 characters explaining the claim');
+  }
+
+  const claim = await claims.findById(req.params.id);
+  if (!claim) throw new ApiError(404, 'Claim not found');
+  if (String(claim.claimant) !== String(req.user._id)) {
+    throw new ApiError(403, 'Only the claimant can reply to this request');
+  }
+  if (claim.status !== 'info_requested') {
+    throw new ApiError(400, 'This claim is not waiting for more information');
+  }
+
+  const updated = await claims.reviseMessage(claim._id, { message, proof });
+  const found = await claims.findWithItem(claim._id);
+
+  await record(req, {
+    action: 'claim.replied',
+    entityType: 'claim',
+    entityId: claim._id,
+    metadata: { item: found.item.id, itemTitle: found.item.title },
+  });
+
+  await notifications.create({
+    user: found.item.reporter,
+    type: 'claim',
+    message: `${req.user.name} answered your request for details on "${found.item.title}"`,
+    item: found.item.id,
+    claim: claim._id,
+  });
+
+  res.json({ success: true, message: 'Reply sent to the finder', claim: updated });
+});
+
 /** DELETE /api/v1/claims/:id — the claimant withdraws a pending claim. */
 const withdrawClaim = asyncHandler(async (req, res) => {
   const claim = await claims.findById(req.params.id);
@@ -149,4 +190,4 @@ const withdrawClaim = asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Claim withdrawn' });
 });
 
-module.exports = { createClaim, getMyClaims, getReceivedClaims, decideClaim, withdrawClaim };
+module.exports = { createClaim, getMyClaims, getReceivedClaims, decideClaim, replyToInfoRequest, withdrawClaim };

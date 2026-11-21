@@ -89,6 +89,17 @@ async function rejectOthers(itemId, exceptId, reviewedBy, note) {
   );
 }
 
+/** The claimant revises their message after the owner asks for more details. */
+async function reviseMessage(id, { message, proof }) {
+  await query(
+    `update claims set message = $2, proof = coalesce($3, proof), status = 'pending',
+            updated_at = now()
+     where id = $1`,
+    [id, message, proof ?? null]
+  );
+  return findById(id);
+}
+
 async function remove(id) {
   await query('delete from claims where id = $1', [id]);
 }
@@ -155,6 +166,7 @@ module.exports = {
   listForItemOwner,
   findWithItem,
   setDecision,
+  reviseMessage,
   rejectOthers,
   remove,
   countAll,

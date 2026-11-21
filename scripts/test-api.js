@@ -123,6 +123,9 @@ process.env.REQUIRE_MODERATION = 'false';
     const search = await call('GET', '/api/v1/items?search=laptop&type=found');
     check('search + filter returns the laptop', search.json.total === 1);
 
+    const ranged = await call('GET', '/api/v1/items?from=2026-11-01&to=2026-12-31&status=active');
+    check('date range + status filters combine', ranged.status === 200 && ranged.json.items.every((i) => i.status === 'active'));
+
     const detail = await call('GET', `/api/v1/items/${itemId}`);
     check('GET /items/:id works for a guest', detail.status === 200 && detail.json.item.claimsCount === 0);
 
@@ -151,6 +154,18 @@ process.env.REQUIRE_MODERATION = 'false';
 
     const decidedByWrongUser = await call('PATCH', `/api/v1/claims/${claimId}`, { token: meeraToken, body: { status: 'approved' } });
     check('claimant cannot decide their own claim', decidedByWrongUser.status === 403);
+
+    const askedInfo = await call('PATCH', `/api/v1/claims/${claimId}`, { token, body: { status: 'info_requested', decisionNote: 'Please share the serial number' } });
+    check('owner can ask for more information', askedInfo.status === 200 && askedInfo.json.claim.status === 'info_requested');
+
+    const replyShort = await call('PATCH', `/api/v1/claims/${claimId}/reply`, { token: meeraToken, body: { message: 'x' } });
+    check('reply shorter than 10 characters is 400', replyShort.status === 400);
+
+    const replyByOwner = await call('PATCH', `/api/v1/claims/${claimId}/reply`, { token, body: { message: 'The owner must not be able to reply as the claimant' } });
+    check('only the claimant can reply', replyByOwner.status === 403);
+
+    const reply = await call('PATCH', `/api/v1/claims/${claimId}/reply`, { token: meeraToken, body: { message: 'The serial number ends 8821 and the invoice is dated 12 March 2024.' } });
+    check('claimant reply returns the claim to pending', reply.status === 200 && reply.json.claim.status === 'pending');
 
     const approved = await call('PATCH', `/api/v1/claims/${claimId}`, { token, body: { status: 'approved', decisionNote: 'Verified the invoice' } });
     check('owner approves the claim', approved.status === 200 && approved.json.claim.status === 'approved');

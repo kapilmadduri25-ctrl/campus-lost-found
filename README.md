@@ -21,9 +21,9 @@ and aligned with the Campus Lost & Found Portal blueprint (privacy, moderation a
 | Home page with hero, Report Lost / Report Found actions, search, filters, recent listings | `public/index.html`, `public/js/home.js` |
 | Register / login / logout, JWT auth, protected routes | `src/controllers/authController.js`, `src/middleware/auth.js` |
 | Lost & found report form: title, category, description, **private proof**, location, date, photo, accuracy confirmation | `public/report.html`, `src/controllers/itemController.js` |
-| Keyword search + category / location / type / status / date filters, 5 sort modes, pagination | `GET /api/v1/items` |
+| Keyword search + category / location / type / status / date-range filters, 5 sort modes, pagination | `GET /api/v1/items` |
 | Item detail with safe public fields, private fields for owner/admin only | `public/item.html`, `src/controllers/itemController.js` |
-| Claim workflow: private message + proof → accept / decline / ask for more info → item resolved | `src/controllers/claimController.js` |
+| Claim workflow: private message + proof → accept / decline / ask for more info → claimant replies → item resolved | `src/controllers/claimController.js` |
 | Student dashboard: 4 tabs + summary counts | `public/dashboard.html`, `GET /api/v1/dashboard/summary` |
 | Admin: statistics and charts, **moderation queue**, hide/reject **with a reason**, user suspension, **audit log** | `public/admin.html`, `src/controllers/adminController.js` |
 | Duplicate / possible-match alerts + notification centre | `src/utils/findMatches.js` |
@@ -186,7 +186,7 @@ Every response carries `X-Request-Id`; every error uses one shape:
 |---|---|
 | `npm run test:smoke` | 14 assertions: routing, validation, auth guards, 404 page |
 | `npm run test:db` | 41 assertions: the real `schema.sql` plus every query, run against an in-memory Postgres (pg-mem) |
-| `npm run test:api` | 37 assertions: the whole Express API booted on top of that in-memory database — login, create, search, claim, approve, moderate, suspend, audit |
+| `npm run test:api` | 42 assertions: the whole Express API booted on top of that in-memory database — login, create, search, claim, ask for details, reply, approve, moderate, suspend, audit |
 
 `docs/TESTING.md` lists every test case with its expected result, including the privacy checks.
 

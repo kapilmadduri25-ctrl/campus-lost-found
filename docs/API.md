@@ -135,6 +135,11 @@ Claims on my listings, including the claimant's contact details and their privat
 Item owner or admin. Body: `{ status: "approved" | "rejected" | "info_requested", decisionNote }`.
 Approving sets the item to `resolved` and auto-rejects the other pending claims.
 
+### PATCH /claims/:id/reply
+The claimant answers a request for more information. Body: `message` (≥ 10 chars), optional `proof`.
+Only valid while the claim is `info_requested`; the claim returns to `pending` and the item owner is
+notified. `403` if anyone other than the claimant calls it, `400` if the claim is not awaiting a reply.
+
 ### DELETE /claims/:id
 The claimant withdraws a pending claim (admins may remove any claim).
 

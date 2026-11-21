@@ -32,6 +32,10 @@ The brief asks for at least eight test cases; the table below lists the ones tha
 | 15 | Owner resolves own item | `PATCH /api/v1/items/{{newItemId}}/status` | `{"status":"resolved"}` | `200`, status `resolved` | Status transition |
 | 16 | Owner tries an admin-only transition | `PATCH …/status` | `{"status":"expired"}` | `403` | Authorisation |
 | 17 | Submit a claim with proof | `POST /api/v1/claims` | itemId + message ≥ 10 | `201` (or `409` if already claimed) | Claim submission |
+| 17a | Owner asks for more information | `PATCH /api/v1/claims/:id` | `{"status":"info_requested"}` | `200`, claim status `info_requested` | Claim review |
+| 17b | Claimant replies with details | `PATCH /api/v1/claims/:id/reply` | message ≥ 10 | `200`, claim back to `pending` | Claim workflow |
+| 17c | Non-claimant tries to reply | same, owner token | — | `403` | Authorisation |
+| 17d | Date-range + status filter | `GET /api/v1/items?from=…&to=…&status=active` | query params | `200`, all rows `active` | Filtering |
 | 18 | Claim with a too-short message | `POST /api/v1/claims` | `message: "mine"` | `400` | Invalid input |
 | 19 | Claims on my listings | `GET /api/v1/claims/received` | owner token | `200` + claims array | Claim review |
 | 20 | Dashboard summary | `GET /api/v1/dashboard/summary` | any token | `200` + counts object | Dashboard |
@@ -49,7 +53,7 @@ The brief asks for at least eight test cases; the table below lists the ones tha
 |---|---|---|
 | `npm run test:smoke` | 14 | routing, validation, auth guards, 404 page |
 | `npm run test:db` | 41 | the real `db/schema.sql` plus every SQL query, against an in-memory Postgres (pg-mem) |
-| `npm run test:api` | 37 | the whole Express API on that in-memory database: login, create, search, claim, approve, moderate, suspend, audit |
+| `npm run test:api` | 42 | the whole Express API on that in-memory database: login, create, search, claim, approve, moderate, suspend, audit |
 
 `npm run test:api` is the fastest way to show a working API without any cloud account: it boots the
 real app and exercises 37 request/response cases, including the 400/401/403 paths.

@@ -18,6 +18,9 @@ const state = {
   category: qs('category') || '',
   location: qs('location') || '',
   type: qs('type') || '',
+  status: qs('status') || '',
+  from: qs('from') || '',
+  to: qs('to') || '',
   sort: qs('sort') || 'newest',
   page: Number(qs('page')) || 1,
 };
@@ -37,6 +40,9 @@ async function loadMeta() {
     catSel.value = state.category;
     locSel.value = state.location;
     document.getElementById('filter-type').value = state.type;
+    document.getElementById('filter-status').value = state.status;
+    document.getElementById('filter-from').value = state.from;
+    document.getElementById('filter-to').value = state.to;
     sortSelect.value = state.sort;
 
     const chips = document.getElementById('quick-chips');
@@ -143,7 +149,24 @@ form.addEventListener('submit', (e) => {
   state.category = document.getElementById('filter-category').value;
   state.location = document.getElementById('filter-location').value;
   state.type = document.getElementById('filter-type').value;
+  state.status = document.getElementById('filter-status').value;
+  state.from = document.getElementById('filter-from').value;
+  state.to = document.getElementById('filter-to').value;
   state.page = 1;
+  load();
+});
+
+document.getElementById('reset-filters')?.addEventListener('click', () => {
+  Object.assign(state, { search: '', category: '', location: '', type: '', status: '', from: '', to: '', sort: 'newest', page: 1 });
+  document.getElementById('search').value = '';
+  document.getElementById('filter-category').value = '';
+  document.getElementById('filter-location').value = '';
+  document.getElementById('filter-type').value = '';
+  document.getElementById('filter-status').value = '';
+  document.getElementById('filter-from').value = '';
+  document.getElementById('filter-to').value = '';
+  sortSelect.value = 'newest';
+  document.querySelectorAll('#quick-chips .chip').forEach((c) => c.setAttribute('aria-pressed', 'false'));
   load();
 });
 
