@@ -1,5 +1,7 @@
 # LOSTLY · Deployment guide (Supabase + Render)
 
+**Live service:** https://lostly-3r3f.onrender.com · commit-tracked, free instance (spins down after 15 minutes idle).
+
 Two free accounts: **Supabase** for the database, **Render** for the Node app.
 Total time: about 15 minutes.
 

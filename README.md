@@ -9,8 +9,9 @@ and aligned with the Campus Lost & Found Portal blueprint (privacy, moderation a
 
 > *Lost it? Let's get it back.*
 >
-> **Live demo:** _add your deployed URL here_
-> **Version:** 3.0 · API base `/api/v1` (the old `/api` paths still work)
+> **Live demo:** https://lostly-3r3f.onrender.com
+> **Live demo:** https://lostly-3r3f.onrender.com
+> **Version:** 4.0 · API base `/api/v1` (the old `/api` paths still work)
 
 ---
 

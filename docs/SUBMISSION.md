@@ -6,8 +6,8 @@ Project: **LOSTLY — Campus Lost & Found Portal** · Web Technology and Interne
 
 | # | Deliverable (from the brief) | Where it is | Status |
 |---|---|---|---|
-| 1 | Complete source code + GitHub repository link | https://github.com/kapilmadduri25-ctrl/campus-lost-found | Done |
-| 2 | Deployed application link | Render URL — _paste it here after deploying_ | Pending |
+| 1 | Complete source code + GitHub repository link | https://github.com/kapilmadduri25-ctrl/campus-lost-found | **Done** |
+| 2 | Deployed application link | https://lostly-3r3f.onrender.com | **Done** |
 | 3 | Project report in the prescribed Sai University format | Written from `docs/DATABASE.md`, `docs/TESTING.md`, `docs/DEPLOYMENT.md` + screenshots | Pending |
 | 4 | Postman API testing evidence | `postman/` collection (27 requests) + screenshots of the runner | Collection ready, screenshots pending |
 
@@ -59,8 +59,8 @@ npm run test:api     # 42 assertions, full HTTP surface
 
 ## Before you submit
 
-- [ ] Render URL added to this file and to `README.md`
+- [x] Render URL added to this file and to `README.md`
 - [ ] Report exported to PDF, matching the prescribed format
 - [ ] Postman screenshots saved under `docs/screenshots/`
 - [ ] AI-use disclosure written in `README.md` and the report
-- [ ] Repository is public and the latest commit is pushed
+- [x] Repository is public and the latest commit is pushed
