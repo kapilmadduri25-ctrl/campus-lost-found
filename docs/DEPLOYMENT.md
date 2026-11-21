@@ -121,6 +121,20 @@ detail, dashboard, admin dashboard, Postman runner summary, Supabase table edito
 
 ---
 
+## Applying the schema (no Render Shell needed)
+
+Render's Shell is a paid feature, so nothing here depends on it:
+
+* **The app migrates itself.** `server.js` calls `migrate()` on every boot, which runs
+  `db/schema.sql` statement by statement. Every statement is `CREATE ... IF NOT EXISTS`, so a
+  redeploy can never fail because a table already exists, and a new table appears on the deployed
+  database the first time the service restarts. Set `AUTO_MIGRATE=false` to turn it off.
+* **There is only one database.** Your laptop and the live site both read `DATABASE_URL` from the
+  same Supabase project, so `npm run db:setup` (and `npm run seed`) run locally already update
+  production. Nothing needs to be executed on the server.
+* **Fallback:** paste the contents of `db/schema.sql` into the Supabase **SQL Editor** and run it.
+  It is idempotent, so running it twice is harmless.
+
 ## Keeping the board tidy
 
 `npm run expire` archives anything still open after `LISTING_TTL_DAYS` (default 90) and rejects its

@@ -56,6 +56,40 @@ async function withTransaction(fn) {
   }
 }
 
+/**
+ * Applies db/schema.sql on boot. Every statement is CREATE ... IF NOT EXISTS, so it is
+ * safe on every deploy and means a new table never depends on someone remembering to run
+ * a command - which matters because Render's Shell is a paid feature.
+ * Set AUTO_MIGRATE=false to skip it.
+ */
+async function migrate() {
+  if (process.env.AUTO_MIGRATE === 'false') return false;
+  const fs = require('fs');
+  const path = require('path');
+  const file = path.join(__dirname, '..', '..', 'db', 'schema.sql');
+  if (!fs.existsSync(file)) return false;
+
+  // Statement by statement, so one object that already exists cannot abort the rest.
+  const sql = fs.readFileSync(file, 'utf8');
+  const statements = sql
+    .split(/;\s*(?:\r?\n|$)/)
+    .map((chunk) => chunk.split('\n').filter((line) => !line.trim().startsWith('--')).join('\n').trim())
+    .filter(Boolean);
+
+  let applied = 0;
+  for (const statement of statements) {
+    try {
+      await query(statement);
+      applied += 1;
+    } catch (err) {
+      if (!/already exists/i.test(err.message)) throw err;
+    }
+  }
+
+  console.log(`[db] schema up to date (${applied} statements checked)`);
+  return true;
+}
+
 async function closeDB() {
   if (pool) {
     await pool.end();
@@ -68,4 +102,6 @@ function _setPool(customPool) {
   pool = customPool;
 }
 
-module.exports = { connectDB, query, withTransaction, closeDB, _setPool, createPool };
+module.exports = {
+  connectDB,
+  migrate, query, withTransaction, closeDB, _setPool, createPool };

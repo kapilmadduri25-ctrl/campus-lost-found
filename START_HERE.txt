@@ -144,6 +144,8 @@ STEP 7 - START THE APP
 
   You should see:
         [server] LOSTLY running on http://localhost:5000
+  (the first line after "[db] PostgreSQL connected" is
+   "[db] schema up to date" - the app creates its own tables)
 
   Leave this terminal running. Do not close VS Code.
   Now open your browser (Chrome) and go to:
