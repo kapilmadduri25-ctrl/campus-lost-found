@@ -24,6 +24,10 @@ function getTransport() {
       port: Number(process.env.SMTP_PORT || 587),
       secure: String(process.env.SMTP_PORT) === '465',
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      // without these a blocked port or dead DNS hangs for minutes
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
     loaded = true;
   }

@@ -26,6 +26,8 @@ const mailer = require('../src/utils/mailer');
     process.exit(0);
   }
 
+  console.log('[mail] connecting... (10 second timeout)');
+
   try {
     const sent = await mailer.sendPasswordReset({
       to,
