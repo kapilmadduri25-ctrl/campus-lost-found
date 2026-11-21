@@ -318,6 +318,30 @@ process.env.REQUIRE_MODERATION = 'false';
     const ownerReject = await call('PATCH', `/api/v1/items/${id3}/status`, { token, body: { status: 'rejected' } });
     check('an owner cannot hide their own listing (admin-only)', ownerReject.status === 403);
 
+    /* ------------------ password recovery flow ------------------------ */
+    const forgotUnknown = await call('POST', '/api/v1/auth/forgot-password', { body: { email: 'nobody@example.com' } });
+    check('forgot-password does not reveal whether an account exists',
+      forgotUnknown.status === 200 && forgotUnknown.json.devToken === undefined);
+
+    const forgot = await call('POST', '/api/v1/auth/forgot-password', { body: { email: 'rahul@saiuniversity.edu.in' } });
+    check('forgot-password issues a single-use token in development',
+      forgot.status === 200 && typeof forgot.json.devToken === 'string' && forgot.json.devToken.length === 64);
+
+    const badReset = await call('POST', '/api/v1/auth/reset-password', { body: { token: 'deadbeef', password: 'NewPassword@1' } });
+    check('an invalid reset token is rejected with 400', badReset.status === 400);
+
+    const shortReset = await call('POST', '/api/v1/auth/reset-password', { body: { token: forgot.json.devToken, password: 'short' } });
+    check('a new password under 8 characters is rejected', shortReset.status === 400);
+
+    const reset = await call('POST', '/api/v1/auth/reset-password', { body: { token: forgot.json.devToken, password: 'NewPassword@1' } });
+    check('a valid token updates the password', reset.status === 200);
+
+    const loginNew = await call('POST', '/api/v1/auth/login', { body: { email: 'rahul@saiuniversity.edu.in', password: 'NewPassword@1' } });
+    check('the new password works', loginNew.status === 200);
+
+    const reuse = await call('POST', '/api/v1/auth/reset-password', { body: { token: forgot.json.devToken, password: 'Another@1234' } });
+    check('a reset token cannot be used twice', reuse.status === 400);
+
   } catch (err) {
     fail += 1;
     console.log(`FAIL  unexpected error: ${err.message}`);

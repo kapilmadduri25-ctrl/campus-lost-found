@@ -48,6 +48,10 @@ async function updateUser(id, fields) {
   return rows[0] ? mapUser(rows[0]) : null;
 }
 
+async function updatePassword(id, passwordHash) {
+  await query('update users set password = $2, updated_at = now() where id = $1', [id, passwordHash]);
+}
+
 async function listUsers() {
   const { rows } = await query(`select ${COLUMNS} from users order by created_at desc`);
   return rows.map((row) => mapUser(row));
@@ -74,4 +78,4 @@ async function countUsers() {
   return rows[0].count;
 }
 
-module.exports = { createUser, findUserForLogin, findUserById, updateUser, listUsers, setRole, setActive, countUsers };
+module.exports = { createUser, findUserForLogin, findUserById, updateUser, updatePassword, listUsers, setRole, setActive, countUsers };

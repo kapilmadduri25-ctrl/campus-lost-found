@@ -4,7 +4,9 @@ import { mountHeader, setYear } from './common.js';
 import { showFormErrors, qs } from './ui.js';
 
 mountHeader();
+wirePasswordToggles();
 setYear();
+wirePasswordToggles();
 
 // only allow same-site relative paths, never an absolute URL
 const rawNext = qs('next') || '';

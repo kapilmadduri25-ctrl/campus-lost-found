@@ -44,6 +44,15 @@ Errors: `400` validation, `409` email already registered.
 Body: `email`, `password` → `200` with `token` + `user`, or `401` for wrong credentials.
 A suspended account (`isActive:false`) gets `403`.
 
+### POST /auth/forgot-password
+Body: `email`. Always returns `200` with the same message, so the endpoint cannot be used to
+discover which addresses have accounts. Creates a single-use token valid for 30 minutes; in
+development the response also contains `devToken` because no mail server is configured.
+
+### POST /auth/reset-password
+Body: `token`, `password` (≥ 8 characters). Exchanges a valid token for a new password, marks the
+token used and rejects any earlier token for that user. `400` for an invalid, expired or reused token.
+
 ### GET /auth/me · PATCH /auth/me
 Read or update the signed-in profile (`name`, `department`, `phone`).
 

@@ -84,11 +84,18 @@
           </div>
           <div class="field">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" required autocomplete="current-password" minlength="8" placeholder="••••••••">
+            <div class="pw-wrap">
+
+              <input type="password" id="password" name="password" required autocomplete="current-password" minlength="8" placeholder="••••••••">
+
+              <button type="button" class="pw-toggle" aria-pressed="false" aria-label="Show password">Show</button>
+
+            </div>
           </div>
           <button class="btn btn-block btn-lg" type="submit" id="submit-btn">Log in</button>
         </form>
 
+        <p class="auth-alt" style="margin-bottom:.4rem"><a href="/forgot-password.html">Forgot your password?</a></p>
         <p class="auth-alt">New here? <a href="/register.html">Create an account</a></p>
 
         <div class="demo-box">

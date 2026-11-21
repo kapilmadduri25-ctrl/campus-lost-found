@@ -101,12 +101,24 @@
           <div class="form-row two">
             <div class="field">
               <label for="password">Password</label>
-              <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+              <div class="pw-wrap">
+
+                <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+
+                <button type="button" class="pw-toggle" aria-pressed="false" aria-label="Show password">Show</button>
+
+              </div>
               <div class="hint">At least 8 characters, with one letter and one number.</div>
             </div>
             <div class="field">
               <label for="confirm">Confirm password</label>
-              <input type="password" id="confirm" name="confirm" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+              <div class="pw-wrap">
+
+                <input type="password" id="confirm" name="confirm" required minlength="8" autocomplete="new-password" placeholder="••••••••">
+
+                <button type="button" class="pw-toggle" aria-pressed="false" aria-label="Show password">Show</button>
+
+              </div>
             </div>
           </div>
 

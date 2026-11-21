@@ -170,3 +170,20 @@ export function showFormErrors(container, error) {
 export function qs(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
+
+/** Adds a show/hide control to every password field on the page. */
+export function wirePasswordToggles() {
+  document.querySelectorAll('.pw-wrap').forEach((wrap) => {
+    const input = wrap.querySelector('input');
+    const btn = wrap.querySelector('.pw-toggle');
+    if (!input || !btn) return;
+    btn.addEventListener('click', () => {
+      const shown = input.type === 'text';
+      input.type = shown ? 'password' : 'text';
+      btn.textContent = shown ? 'Show' : 'Hide';
+      btn.setAttribute('aria-pressed', String(!shown));
+      btn.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+      input.focus();
+    });
+  });
+}

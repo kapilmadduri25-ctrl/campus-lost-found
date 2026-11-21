@@ -106,3 +106,19 @@ create table if not exists audit_logs (
 );
 create index if not exists audit_created_idx on audit_logs (created_at desc);
 create index if not exists audit_action_idx  on audit_logs (action);
+
+-- ---------------------------------------------------------------------------
+-- password_resets : single-use tokens for the "forgot password" flow.
+-- Only the SHA-256 hash of the token is stored, so a database leak cannot be
+-- replayed. A token is valid for 30 minutes and can be used once.
+-- ---------------------------------------------------------------------------
+create table if not exists password_resets (
+  id uuid primary key,
+  user_id uuid not null references users(id) on delete cascade,
+  token_hash text not null,
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create index if not exists password_resets_token_idx on password_resets (token_hash);
+create index if not exists password_resets_user_idx on password_resets (user_id);

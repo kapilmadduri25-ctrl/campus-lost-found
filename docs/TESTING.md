@@ -35,6 +35,8 @@ The brief asks for at least eight test cases. Rows numbered `A17x` are covered b
 | A17a | Owner asks for more information | `PATCH /api/v1/claims/:id` | `{"status":"info_requested"}` | `200`, claim status `info_requested` | Claim review |
 | A17b | Claimant replies with details | `PATCH /api/v1/claims/:id/reply` | message ≥ 10 | `200`, claim back to `pending` | Claim workflow |
 | A17c | Non-claimant tries to reply | same, owner token | — | `403` | Authorisation |
+| A18a | Forgot password for an unknown address | `POST /api/v1/auth/forgot-password` | `nobody@example.com` | `200`, no token (no account enumeration) | Account recovery |
+| A18b | Reset with a valid token | `POST /api/v1/auth/reset-password` | token + new password | `200`, new password works, token cannot be reused | Account recovery |
 | A17d | Date-range + status filter | `GET /api/v1/items?from=…&to=…&status=active` | query params | `200`, all rows `active` | Filtering |
 | 18 | Claim with a too-short message | `POST /api/v1/claims` | `message: "mine"` | `400` | Invalid input |
 | 19 | Claims on my listings | `GET /api/v1/claims/received` | owner token | `200` + claims array | Claim review |
@@ -56,7 +58,7 @@ The brief asks for at least eight test cases. Rows numbered `A17x` are covered b
 | `npm run test:api` | 42 | the whole Express API on that in-memory database: login, create, search, claim, approve, moderate, suspend, audit |
 
 `npm run test:api` is the fastest way to show a working API without any cloud account: it boots the
-real app and exercises 42 request/response cases, including the 400/401/403 paths.
+real app and exercises 66 request/response cases, including the 400/401/403 paths.
 
 ## Non-Postman checks
 
