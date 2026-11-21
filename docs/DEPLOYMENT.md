@@ -118,3 +118,18 @@ git push -u origin main
 
 Capture at 1440 px (and one at 375 px): home, register, report form with possible matches, item
 detail, dashboard, admin dashboard, Postman runner summary, Supabase table editor, Render dashboard.
+
+---
+
+## Keeping the board tidy
+
+`npm run expire` archives anything still open after `LISTING_TTL_DAYS` (default 90) and rejects its
+outstanding claims. On Render, add a **Cron Job** pointing at the same repository:
+
+| Field | Value |
+|---|---|
+| Command | `npm run expire` |
+| Schedule | `0 3 * * 1` (every Monday, 03:00) |
+| Environment | the same `DATABASE_URL` |
+
+Without a cron job the command can be run by hand from the service **Shell** once a term.

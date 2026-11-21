@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const {
   getItems,
   getItemById,
@@ -15,13 +16,22 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
-router.param('id', validateParamId); // malformed uuid -> 404, never a 500
+router.param('id', validateParamId);
+
+// a student cannot flood the board: 30 new listings per hour per IP
+const writeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: { code: 'RATE_LIMITED', message: 'Too many listings from this address, please try again later' } },
+}); // malformed uuid -> 404, never a 500
 
 router.get('/', optionalAuth, getItems);
 router.get('/user/mine', protect, getMyItems); // must stay above '/:id'
 router.get('/:id', optionalAuth, getItemById);
 
-router.post('/', protect, upload.single('image'), upload.cleanupOnFailure, validateItem, createItem);
+router.post('/', protect, writeLimiter, upload.single('image'), upload.cleanupOnFailure, validateItem, createItem);
 router.patch('/:id', protect, upload.single('image'), upload.cleanupOnFailure, validateItemUpdate, updateItem);
 router.patch('/:id/status', protect, updateStatus);
 router.delete('/:id', protect, deleteItem);

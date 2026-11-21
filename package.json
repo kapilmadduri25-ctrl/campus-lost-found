@@ -11,7 +11,8 @@
     "seed": "node src/seed.js",
     "test:smoke": "node scripts/smoke-test.js",
     "test:db": "node scripts/test-db.js",
-    "test:api": "node scripts/test-api.js"
+    "test:api": "node scripts/test-api.js",
+    "expire": "node scripts/expire.js"
   },
   "keywords": [
     "express",
