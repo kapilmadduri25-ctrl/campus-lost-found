@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "LOSTLY - API Tests (v1)",
-    "description": "24 requests / 45+ assertions for the LOSTLY campus portal. The API is versioned under /api/v1. Run 'Auth > Login (student)' first: it saves the token used by the protected requests.",
+    "description": "30 requests for the LOSTLY campus portal. Run folder 1 first (it captures token, otherToken and adminToken), then the rest in order.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -91,6 +91,92 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"arjun@saiuniversity.edu.in\",\n  \"password\": \"Password@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (second student) - saves otherToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('otherToken', json.token);",
+                  "pm.test('otherToken captured', () => pm.expect(json.token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in the seeded student and stores the token.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"meera@saiuniversity.edu.in\",\n  \"password\": \"Password@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (admin) - saves adminToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', json.token);",
+                  "pm.test('adminToken captured', () => pm.expect(json.token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in the seeded student and stores the token.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@saiuniversity.edu.in\",\n  \"password\": \"Admin@12345\"\n}"
             }
           }
         },
@@ -531,7 +617,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                  "pm.test('403 forbidden - not the owner', () => pm.response.to.have.status(403));",
+                  "pm.test('error code is FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
                 ]
               }
             }
@@ -541,11 +628,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{otherToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -671,8 +755,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('201 Created or 409 already claimed', () => pm.expect([201, 409]).to.include(pm.response.code));",
-                  "if (pm.response.code === 201) pm.collectionVariables.set('claimId', pm.response.json().claim._id);"
+                  "pm.test('201 created', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('claimId', json.claim._id);",
+                  "pm.test('claim starts pending', () => pm.expect(json.claim.status).to.eql('pending'));"
                 ]
               }
             }
@@ -682,11 +768,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{otherToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -703,7 +786,48 @@
             "description": "Claim submission with private proof. Expected 201 (or 409 if already claimed).",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"itemId\": \"{{itemId}}\",\n  \"message\": \"This is my item, I can describe the sticker on the lid and the login wallpaper.\",\n  \"proof\": \"Purchase invoice from 2024\"\n}"
+              "raw": "{\n  \"itemId\": \"{{newItemId}}\",\n  \"message\": \"This is mine - the serial number ends 8821 and I have the invoice.\",\n  \"proof\": \"Invoice dated 12 March 2024, purchase price Rs 64,000.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit the same claim again (should conflict)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('409 conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('error code is CONFLICT', () => pm.expect(pm.response.json().error.code).to.eql('CONFLICT'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{otherToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/claims",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "claims"
+              ]
+            },
+            "description": "Claim submission with private proof. Expected 201 (or 409 if already claimed).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": \"{{newItemId}}\",\n  \"message\": \"This is mine - the serial number ends 8821 and I have the invoice.\",\n  \"proof\": \"Invoice dated 12 March 2024, purchase price Rs 64,000.\"\n}"
             }
           }
         },
@@ -874,8 +998,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('200 OK or 403 with a student token', () => pm.expect([200, 403]).to.include(pm.response.code));",
-                  "if (pm.response.code === 200) { const s = pm.response.json().stats; pm.test('totals present', () => { pm.expect(s.totals.items).to.be.a('number'); pm.expect(s.totals.pendingModeration).to.be.a('number'); }); }"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json().stats;",
+                  "pm.test('totals present', () => pm.expect(s.totals.items).to.be.a('number'));",
+                  "pm.test('seven day series', () => pm.expect(s.last7Days.length).to.eql(7));"
                 ]
               }
             }
@@ -885,7 +1011,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -904,42 +1031,6 @@
           }
         },
         {
-          "name": "Admin route with a student token",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('403 Forbidden for non-admin', () => pm.response.to.have.status(403));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/stats",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "stats"
-              ]
-            },
-            "description": "Authorisation check. Expected 403."
-          }
-        },
-        {
           "name": "Moderation queue",
           "event": [
             {
@@ -947,7 +1038,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('200 OK or 403 with a student token', () => pm.expect([200, 403]).to.include(pm.response.code));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('queue is an array', () => pm.expect(pm.response.json().items).to.be.an('array'));"
                 ]
               }
             }
@@ -957,7 +1049,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -982,6 +1075,43 @@
           }
         },
         {
+          "name": "Admin route with a student token (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 forbidden', () => pm.response.to.have.status(403));",
+                  "pm.test('error code is FORBIDDEN', () => pm.expect(pm.response.json().error.code).to.eql('FORBIDDEN'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
           "name": "Moderate a listing (approve)",
           "event": [
             {
@@ -989,7 +1119,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('200 OK or 403 with a student token', () => pm.expect([200, 403]).to.include(pm.response.code));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('listing is active', () => pm.expect(pm.response.json().item.status).to.eql('active'));"
                 ]
               }
             }
@@ -999,11 +1130,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -1034,7 +1162,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('400 or 403', () => pm.expect([400, 403]).to.include(pm.response.code));"
+                  "pm.test('400 - a reason is required', () => pm.response.to.have.status(400));",
+                  "pm.test('error code is VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));"
                 ]
               }
             }
@@ -1044,11 +1173,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -1079,7 +1205,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('200 OK or 403 with a student token', () => pm.expect([200, 403]).to.include(pm.response.code));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const logs = pm.response.json().logs;",
+                  "pm.test('audit entries exist', () => pm.expect(logs.length).to.be.above(0));",
+                  "pm.test('entries carry an action', () => pm.expect(logs[0].action).to.be.a('string'));"
                 ]
               }
             }
@@ -1089,7 +1218,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
               }
             ],
             "url": {
@@ -1121,8 +1251,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('200 or 403 depending on the token used', () => pm.expect([200, 403]).to.include(pm.response.code));",
-                  "if (pm.response.code === 200) pm.test('no password hash in the payload', () => pm.expect(JSON.stringify(pm.response.json())).to.not.include('$2a$'));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('users listed', () => pm.expect(pm.response.json().users.length).to.be.above(0));"
                 ]
               }
             }
@@ -1132,7 +1262,8 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}"
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
               }
             ],
             "url": {

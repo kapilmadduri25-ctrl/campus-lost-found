@@ -65,6 +65,11 @@ if (requireLogin()) {
       submitBtn.textContent = 'Save changes';
       try {
         const { item } = await api(`/api/v1/items/${editId}`);
+        if (!item.isOwner) {
+          showFormErrors(errorBox, { message: 'You can only edit your own listings.' });
+          submitBtn.disabled = true;
+          return;
+        }
         document.getElementById('title').value = item.title;
         descEl.value = item.description;
         document.getElementById('desc-count').textContent = String(item.description.length);

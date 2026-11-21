@@ -6,7 +6,9 @@ import { showFormErrors, qs } from './ui.js';
 mountHeader();
 setYear();
 
-const nextUrl = qs('next') || '/dashboard.html';
+// only allow same-site relative paths, never an absolute URL
+const rawNext = qs('next') || '';
+const nextUrl = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard.html';
 if (isLoggedIn()) window.location.replace(nextUrl);
 
 const errorBox = document.getElementById('form-errors');

@@ -11,21 +11,21 @@ function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-va
   let message = err.message || 'Something went wrong';
   let details = err.details;
 
-  if (err.name === 'ValidationError') {
-    statusCode = 400;
-    message = 'Validation failed';
-    details = Object.values(err.errors).map((e) => ({ field: e.path, message: e.message }));
-  }
-
-  if (err.code === 11000) {
-    statusCode = 409;
-    const field = Object.keys(err.keyPattern || { field: 1 })[0];
-    message = `A record with that ${field} already exists`;
-  }
-
-  if (err.name === 'CastError') {
-    statusCode = 400;
-    message = `Invalid value for ${err.path}`;
+  // ---- PostgreSQL error codes -------------------------------------------
+  // 23505 unique violation, 23503 foreign key, 23514 check, 22P02 bad uuid, 22007/22008 bad date
+  const PG = {
+    '23505': [409, 'CONFLICT', 'That record already exists'],
+    '23503': [409, 'CONFLICT', 'A related record is missing'],
+    '23514': [400, 'VALIDATION_ERROR', 'A value is not allowed'],
+    '22P02': [400, 'VALIDATION_ERROR', 'Invalid identifier'],
+    '22007': [400, 'VALIDATION_ERROR', 'Invalid date'],
+    '22008': [400, 'VALIDATION_ERROR', 'Invalid date'],
+  };
+  if (err.code && PG[err.code]) {
+    const [code, errorCode, text] = PG[err.code];
+    statusCode = code;
+    message = text;
+    err.errorCode = errorCode;
   }
 
   if (err.code === 'LIMIT_FILE_SIZE') {
@@ -33,22 +33,31 @@ function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-va
     message = 'Image is too large (maximum 2 MB)';
   }
 
-  if (process.env.NODE_ENV !== 'production' && statusCode >= 500) {
-    console.error('[error]', err);
+  // never leak internals for a server-side failure
+  if (statusCode >= 500) {
+    if (process.env.NODE_ENV !== 'production') console.error('[error]', err);
+    message = 'Something went wrong on the server';
   }
+
+  const code =
+    err.errorCode ||
+    (statusCode === 400 ? 'VALIDATION_ERROR'
+      : statusCode === 401 ? 'UNAUTHENTICATED'
+        : statusCode === 403 ? 'FORBIDDEN'
+          : statusCode === 404 ? 'NOT_FOUND'
+            : statusCode === 409 ? 'CONFLICT'
+              : statusCode === 413 ? 'PAYLOAD_TOO_LARGE'
+                : statusCode === 429 ? 'RATE_LIMITED'
+                  : 'SERVER_ERROR');
 
   res.status(statusCode).json({
     success: false,
-    error: {
-      code: statusCode === 400 ? 'VALIDATION_ERROR' : statusCode === 401 ? 'UNAUTHENTICATED' : statusCode === 403 ? 'FORBIDDEN' : statusCode === 404 ? 'NOT_FOUND' : statusCode === 409 ? 'CONFLICT' : statusCode === 429 ? 'RATE_LIMITED' : 'SERVER_ERROR',
-      message,
-      ...(details ? { details } : {}),
-    },
+    error: { code, message, ...(details ? { details } : {}) },
     // kept for backwards compatibility with the earlier response shape
     message,
     ...(details ? { details } : {}),
     requestId: req.id || null,
-    ...(process.env.NODE_ENV === 'production' ? {} : { stack: err.stack }),
+    ...(process.env.NODE_ENV === 'development' ? { stack: err.stack } : {}),
   });
 }
 

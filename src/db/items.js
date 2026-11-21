@@ -143,10 +143,8 @@ async function setStatus(id, { status, resolvedAt = null, moderationReason, mode
   const sets = ['status = $2', 'updated_at = now()'];
   const params = [id, status];
 
-  if (resolvedAt !== undefined && resolvedAt !== null) {
-    params.push(resolvedAt);
-    sets.push(`resolved_at = $${params.length}`);
-  }
+  // the timestamp always matches the status, so metrics can trust it
+  sets.push(status === 'resolved' ? 'resolved_at = now()' : 'resolved_at = null');
   if (moderationReason !== undefined) {
     params.push(moderationReason);
     sets.push(`moderation_reason = $${params.length}`);
@@ -174,7 +172,7 @@ async function listByReporter(reporterId) {
      where i.reporter = $1 order by i.created_at desc`,
     [reporterId]
   );
-  return rows.map((r) => mapItem(r));
+  return rows.map((r) => mapItem(r, { includePrivate: true })); // owner-scoped endpoint
 }
 
 /** Claim counts per item for the dashboard table. */

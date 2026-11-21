@@ -5,6 +5,7 @@ const { withTransaction } = require('../config/db');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { record } = require('../utils/audit');
+const { mapClaim } = require('../db/mappers');
 
 /** POST /api/v1/claims — protected. Private message + optional private proof. */
 const createClaim = asyncHandler(async (req, res) => {
@@ -86,27 +87,47 @@ const decideClaim = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Only the person who posted the item (or an admin) can decide this claim');
   }
 
+  if (!['pending', 'info_requested'].includes(claim.status)) {
+    throw new ApiError(409, `This claim has already been ${claim.status}`);
+  }
+
   const decided = await withTransaction(async (client) => {
-    await client.query(
+    // 1. the claim must still be undecided (guards against a double decision)
+    const claimUpdate = await client.query(
       `update claims set status = $2, decision_note = $3, reviewed_by = $4,
               reviewed_at = now(), updated_at = now()
-       where id = $1`,
+       where id = $1 and status in ('pending', 'info_requested')
+       returning *`,
       [claim._id, status, decisionNote || '', req.user._id]
     );
+    if (claimUpdate.rowCount === 0) {
+      throw new ApiError(409, 'This claim has already been decided');
+    }
 
     if (status === 'approved') {
-      await client.query(
-        `update items set status = 'resolved', resolved_at = now(), updated_at = now() where id = $1`,
+      // 2. the item must still be open — a rejected/expired listing cannot be
+      //    resurrected by approving a claim on it
+      const itemUpdate = await client.query(
+        `update items set status = 'resolved', resolved_at = now(), updated_at = now()
+         where id = $1 and status in ('active', 'claim_requested')
+         returning id`,
         [item.id]
       );
+      if (itemUpdate.rowCount === 0) {
+        throw new ApiError(409, 'This listing is no longer open for claims');
+      }
+
+      // 3. every rival claim is closed out
       await client.query(
         `update claims set status = 'rejected', decision_note = $3, reviewed_by = $4,
                 reviewed_at = now(), updated_at = now()
-         where item = $1 and id <> $2 and status = 'pending'`,
+         where item = $1 and id <> $2 and status in ('pending', 'info_requested')`,
         [item.id, claim._id, 'Another claim was approved', req.user._id]
       );
     }
-    return claims.findById(claim._id);
+
+    // 4. read back on the SAME connection so the committed values are returned
+    return mapClaim(claimUpdate.rows[0]);
   });
 
   await record(req, {

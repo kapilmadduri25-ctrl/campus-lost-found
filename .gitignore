@@ -7,3 +7,11 @@ npm-debug.log*
 .DS_Store
 coverage/
 *.log
+
+# Windows / editor junk
+Thumbs.db
+Desktop.ini
+
+# never commit real env files
+.env.*
+!.env.example

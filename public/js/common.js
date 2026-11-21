@@ -44,6 +44,16 @@ export function mountHeader() {
       toggle.querySelector('.nav-toggle-label').textContent = open ? 'Close' : 'Menu';
     });
 
+    // Escape closes the menu and returns focus to the toggle
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.querySelector('.nav-toggle-label').textContent = 'Menu';
+        toggle.focus();
+      }
+    });
+
     // close the mobile menu after choosing a destination
     nav.addEventListener('click', (e) => {
       if (e.target.closest('a') && nav.classList.contains('open')) {

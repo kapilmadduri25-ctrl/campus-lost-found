@@ -10,7 +10,7 @@ and aligned with the Campus Lost & Found Portal blueprint (privacy, moderation a
 > *Lost it? Let's get it back.*
 >
 > **Live demo:** https://lostly-3r3f.onrender.com
-> **Live demo:** https://lostly-3r3f.onrender.com
+> **Repository:** https://github.com/kapilmadduri25-ctrl/campus-lost-found
 > **Version:** 4.0 · API base `/api/v1` (the old `/api` paths still work)
 
 ---
@@ -54,16 +54,16 @@ and every transition writes an entry to the audit log.
 - **Database:** Supabase (PostgreSQL 15) through `pg` — five tables, foreign keys with cascade deletes, unique constraints, indexes, and parameterised SQL only.
 - **Auth:** JWT bearer tokens, `bcryptjs` hashing, roles (`student`, `admin`), account suspension.
 - **Uploads:** `multer`, JPG/PNG/WEBP/GIF only, 2 MB cap, server-generated filenames.
-- **Security:** `helmet`, CORS allow-list, rate limiting, NoSQL-injection sanitiser, ownership checks, private-field projections, output escaping.
-- **Testing:** Postman collection + a database-free smoke test.
-- **Deployment:** Supabase + Render (or Railway).
+- **Security:** `helmet`, CORS allow-list, rate limiting, JSON key sanitiser, ownership checks, explicit private-column projections, output escaping.
+- **Testing:** Postman collection + three database-free automated suites (smoke, db, api).
+- **Deployment:** Supabase + Render (see `docs/DEPLOYMENT.md`).
 
 ---
 
 ## 3. Folder structure
 
 ```
-campus-lost-found/
+lostly/
 ├── server.js                    # load .env → connect DB → listen
 ├── package.json  package-lock.json
 ├── .env.example                 # template (copy to .env)
@@ -185,7 +185,7 @@ Every response carries `X-Request-Id`; every error uses one shape:
 
 | Command | What it proves |
 |---|---|
-| `npm run test:smoke` | 14 assertions: routing, validation, auth guards, 404 page |
+| `npm run test:smoke` | 18 assertions: routing, validation, auth guards, 404 page |
 | `npm run test:db` | 41 assertions: the real `schema.sql` plus every query, run against an in-memory Postgres (pg-mem) |
 | `npm run test:api` | 42 assertions: the whole Express API booted on top of that in-memory database — login, create, search, claim, ask for details, reply, approve, moderate, suspend, audit |
 
@@ -206,10 +206,10 @@ Step-by-step with screenshots-to-take: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md
 
 ## 8. Security and privacy
 
-- Passwords hashed with bcrypt (10 rounds); `password` is `select:false` and never returned.
-- **Public APIs never expose private data.** Search results populate only the reporter's name; email, phone and department appear only to the owner/admin. `descriptionPrivate` is `select:false`, and claim `proof` is visible only to the claimant and the item owner.
+- Passwords hashed with bcrypt (10 rounds); the `password` column is never included in a `SELECT` outside the login query.
+- **Public APIs never expose private data.** Search results populate only the reporter's name; email, phone and department appear only to the owner/admin. `descriptionPrivate` is only selected for the owner or an admin, and claim `proof` is visible only to the claimant and the item owner.
 - Ownership checked in the controller for every mutation; admin routes gated by `protect` + `adminOnly`.
-- `sanitize` middleware strips `$`-prefixed and dotted keys (NoSQL injection).
+- `sanitize` middleware strips `$`-prefixed and dotted keys from JSON bodies as defence in depth (the SQL layer is parameterised, so this is belt-and-braces).
 - `helmet` headers, rate-limited auth endpoints, MIME + size limited uploads, escaped output (`escapeHtml`).
 - Every moderation decision, status change, deletion and account action is written to `audit_logs` with actor, reason and IP.
 - All SQL is parameterised (`$1`, `$2`, …) — no string concatenation, so SQL injection is structurally impossible.
@@ -242,27 +242,19 @@ Design previews (mock data, not submission screenshots) are in `docs/design-prev
 
 ## 11. Screenshots
 
-Add your own to `docs/screenshots/`:
-
-| Screen | File |
-|---|---|
-| Home with Report Lost / Report Found | `01-home.png` |
-| Report form with private details + possible matches | `02-report.png` |
-| Item detail + private claim | `03-item.png` |
-| Student dashboard | `04-dashboard.png` |
-| Admin dashboard with moderation queue and audit log | `05-admin.png` |
-| Postman collection runner | `06-postman.png` |
+Capture the nine files listed in [`docs/screenshots/README.md`](docs/screenshots/README.md) — that
+folder is the single source of truth for names, so the report's figure captions and the files always match.
 
 ---
 
 ## 12. AI-use disclosure
 
-_Per the project brief, disclose any AI assistance here._ Suggested wording:
-
-> Parts of this project (initial scaffolding of the Express routes, the CSS layout, the documentation)
-> were drafted with the help of an AI assistant. I reviewed, tested and modified every file, and I can
-> explain the full request/response flow, the database schema, the moderation workflow and the security
-> middleware during the viva.
+In line with the project brief, I disclose the following. An AI assistant was used to help scaffold the
+Express route and controller structure, to draft the layered CSS design system, and to draft parts of this
+README and the report. Every file was reviewed, executed and modified by me: the application was run locally
+against Supabase, the three test suites were executed, and the API was exercised through Postman. I can
+explain the request lifecycle, the database schema, the claim transaction and the security middleware during
+the viva.
 
 ---
 

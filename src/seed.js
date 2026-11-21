@@ -58,7 +58,12 @@ async function run() {
   }
 
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@saiuniversity.edu.in';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
+  const adminPassword = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === 'production' ? null : 'Admin@12345');
+  if (!adminPassword) {
+    console.error('[seed] ADMIN_PASSWORD must be set when NODE_ENV=production. Refusing to create an admin with a default password.');
+    await closeDB();
+    process.exit(1);
+  }
   const hash = (pwd) => bcrypt.hash(pwd, 10);
 
   let admin = await users.findUserForLogin(adminEmail);

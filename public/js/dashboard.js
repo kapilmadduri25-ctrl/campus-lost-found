@@ -259,24 +259,24 @@ if (requireLogin()) {
         return;
       }
       panels.notifications.innerHTML = `
-        <div style="display:flex;justify-content:flex-end;padding:.6rem .8rem;border-bottom:1px solid #f3f4f6">
+        <div class="notif-toolbar">
           <button class="btn btn-outline btn-sm" id="mark-all">Mark all as read</button>
         </div>
         ${notifications
           .map(
-            (n) => `<div class="notif ${n.read ? 'read' : 'unread'}" data-notif="${n._id}" role="button" tabindex="0">
+            (n) => `<div class="notif ${n.read ? 'read' : 'unread'}" data-notif="${n._id}">
               <span class="notif-dot" aria-hidden="true"></span>
               <div style="flex:1">
                 <div class="small" style="font-weight:600">${escapeHtml(n.message)}</div>
-                <div class="small muted">${timeAgo(n.createdAt)} · ${escapeHtml(n.type)}${n.item ? ` · <a href="/item.html?id=${n.item}">view item</a>` : ''}</div>
+                <div class="small muted">${timeAgo(n.createdAt)} · ${escapeHtml(n.type)}${n.item ? ` · <a href="/item.html?id=${n.item}">view item</a>` : ''}${n.read ? '' : ` · <button type="button" class="linklike" data-read="${n._id}">mark as read</button>`}</div>
               </div>
             </div>`
           )
           .join('')}`;
 
       panels.notifications.querySelectorAll('[data-notif]').forEach((el) => {
-        const markRead = async (event) => {
-          if (event.target.closest('a')) return; // let the item link work
+        el.addEventListener('click', async (event) => {
+          if (event.target.closest('a') || event.target.closest('button')) return;
           if (el.classList.contains('read')) return;
           try {
             await api(`/api/v1/notifications/${el.dataset.notif}/read`, { method: 'PATCH' });
@@ -286,10 +286,18 @@ if (requireLogin()) {
           } catch {
             /* cosmetic only */
           }
-        };
-        el.addEventListener('click', markRead);
-        el.addEventListener('keydown', (event) => {
-          if (event.key === 'Enter' || event.key === ' ') markRead(event);
+        });
+      });
+
+      panels.notifications.querySelectorAll('[data-read]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          try {
+            await api(`/api/v1/notifications/${btn.dataset.read}/read`, { method: 'PATCH' });
+            loadNotifications();
+            loadStats();
+          } catch (err) {
+            toast(err.message, 'error');
+          }
         });
       });
 

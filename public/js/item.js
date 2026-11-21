@@ -32,7 +32,7 @@ function render(item) {
   const user = getUser();
   const isOwner = Boolean(user) && String(user._id) === String(item.reporter?._id);
   const canClaim = isLoggedIn() && !isOwner && ['active', 'claim_requested'].includes(item.status);
-  document.title = `${item.title} · Campus Lost & Found`;
+  document.title = `${item.title} · Lostly`;
 
   const image = item.imageUrl
     ? `<div class="detail-image"><img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.title)}"></div>`

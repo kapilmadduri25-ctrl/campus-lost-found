@@ -48,9 +48,6 @@ function mapItem(row, { includePrivate = false } = {}) {
     imageUrl: row.image_url,
     contactInfo: row.contact_info,
     status: row.status,
-    moderationReason: row.moderation_reason,
-    moderatedBy: row.moderated_by,
-    moderatedAt: iso(row.moderated_at),
     resolvedAt: iso(row.resolved_at),
     reporter: row.reporter_name ? mapReporter(row) : row.reporter,
     views: row.views,
@@ -58,7 +55,13 @@ function mapItem(row, { includePrivate = false } = {}) {
     updatedAt: iso(row.updated_at),
     isOpen: row.status === 'active' || row.status === 'claim_requested',
   };
-  if (includePrivate) item.descriptionPrivate = row.description_private || '';
+  if (includePrivate) {
+    item.descriptionPrivate = row.description_private || '';
+    // moderation notes and the moderator's id stay internal
+    item.moderationReason = row.moderation_reason;
+    item.moderatedBy = row.moderated_by;
+    item.moderatedAt = iso(row.moderated_at);
+  }
   return item;
 }
 

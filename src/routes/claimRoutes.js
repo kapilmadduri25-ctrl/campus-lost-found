@@ -7,10 +7,13 @@ const {
   replyToInfoRequest,
   withdrawClaim,
 } = require('../controllers/claimController');
+const { validateParamId } = require('../middleware/validate');
 const { protect } = require('../middleware/auth');
 const { validateClaim } = require('../middleware/validate');
 
 const router = express.Router();
+
+router.param('id', validateParamId);
 
 router.post('/', protect, validateClaim, createClaim);
 router.get('/mine', protect, getMyClaims);

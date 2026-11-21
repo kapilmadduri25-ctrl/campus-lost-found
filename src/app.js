@@ -31,7 +31,7 @@ app.use(cors(origins.length ? { origin: origins, credentials: true } : {}));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(requestId);   // correlation id on every request + X-Request-Id header
-app.use(sanitize);    // strips $ and . keys from body/query/params (NoSQL injection guard)
+app.use(sanitize);    // strips $ and . keys from body/query/params (JSON key hardening)
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 /* --------------------------- static frontend --------------------------- */

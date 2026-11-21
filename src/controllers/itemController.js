@@ -13,6 +13,14 @@ const PUBLIC_STATUSES = ['active', 'claim_requested'];
 const PUBLIC_DETAIL_STATUSES = [...PUBLIC_STATUSES, 'resolved'];
 const ALL_STATUSES = items.ALL_STATUSES;
 
+/** Parses a date query param, rejecting anything that is not a real date. */
+function parseDate(value, field) {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) throw new ApiError(400, `${field} must be a valid date`);
+  return date;
+}
+
 /** The private proof field must never travel in a response body. */
 function withoutPrivate(item) {
   const { descriptionPrivate, ...rest } = item;
@@ -39,8 +47,8 @@ const getItems = asyncHandler(async (req, res) => {
     location,
     type,
     statuses,
-    from: from ? new Date(from) : undefined,
-    to: to ? new Date(to) : undefined,
+    from: parseDate(from, 'from'),
+    to: parseDate(to, 'to'),
     sort,
     page,
     limit,
@@ -166,6 +174,7 @@ const updateItem = asyncHandler(async (req, res) => {
     description: req.body.description,
     descriptionPrivate: req.body.descriptionPrivate,
     category: req.body.category,
+    type: req.body.type,
     location: req.body.location,
     dateLostOrFound: req.body.dateLostOrFound ? new Date(req.body.dateLostOrFound) : undefined,
     contactInfo: req.body.contactInfo,

@@ -740,3 +740,17 @@ tbody tr:hover { background: var(--surface-2); }
   color: var(--text-muted);
   border-color: var(--border-strong);
 }
+
+/* ------------------- dark theme: readable primary controls ------------ */
+[data-theme="dark"] .btn { --btn-fg: var(--text-invert); }
+[data-theme="dark"] .btn-outline { --btn-fg: var(--text); }
+[data-theme="dark"] .chip[aria-pressed="true"],
+[data-theme="dark"] .pagination button[aria-current="true"] { color: var(--text-invert); }
+[data-theme="dark"] .btn-danger { --btn-fg: #2b1917; }
+
+.notif-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}

@@ -1,7 +1,7 @@
 # Testing evidence (Postman)
 
-Collection: `postman/Campus_Lost_Found.postman_collection.json` — **27 requests, 45+ assertions**.
-The brief asks for at least eight test cases; the table below lists the ones that matter most.
+Collection: `postman/Campus_Lost_Found.postman_collection.json` — **30 requests, 55+ assertions**.
+The brief asks for at least eight test cases. Rows numbered `A17x` are covered by the automated suite (`npm run test:api`) rather than by a Postman request.
 
 ## How to run
 
@@ -32,10 +32,10 @@ The brief asks for at least eight test cases; the table below lists the ones tha
 | 15 | Owner resolves own item | `PATCH /api/v1/items/{{newItemId}}/status` | `{"status":"resolved"}` | `200`, status `resolved` | Status transition |
 | 16 | Owner tries an admin-only transition | `PATCH …/status` | `{"status":"expired"}` | `403` | Authorisation |
 | 17 | Submit a claim with proof | `POST /api/v1/claims` | itemId + message ≥ 10 | `201` (or `409` if already claimed) | Claim submission |
-| 17a | Owner asks for more information | `PATCH /api/v1/claims/:id` | `{"status":"info_requested"}` | `200`, claim status `info_requested` | Claim review |
-| 17b | Claimant replies with details | `PATCH /api/v1/claims/:id/reply` | message ≥ 10 | `200`, claim back to `pending` | Claim workflow |
-| 17c | Non-claimant tries to reply | same, owner token | — | `403` | Authorisation |
-| 17d | Date-range + status filter | `GET /api/v1/items?from=…&to=…&status=active` | query params | `200`, all rows `active` | Filtering |
+| A17a | Owner asks for more information | `PATCH /api/v1/claims/:id` | `{"status":"info_requested"}` | `200`, claim status `info_requested` | Claim review |
+| A17b | Claimant replies with details | `PATCH /api/v1/claims/:id/reply` | message ≥ 10 | `200`, claim back to `pending` | Claim workflow |
+| A17c | Non-claimant tries to reply | same, owner token | — | `403` | Authorisation |
+| A17d | Date-range + status filter | `GET /api/v1/items?from=…&to=…&status=active` | query params | `200`, all rows `active` | Filtering |
 | 18 | Claim with a too-short message | `POST /api/v1/claims` | `message: "mine"` | `400` | Invalid input |
 | 19 | Claims on my listings | `GET /api/v1/claims/received` | owner token | `200` + claims array | Claim review |
 | 20 | Dashboard summary | `GET /api/v1/dashboard/summary` | any token | `200` + counts object | Dashboard |
@@ -56,11 +56,11 @@ The brief asks for at least eight test cases; the table below lists the ones tha
 | `npm run test:api` | 42 | the whole Express API on that in-memory database: login, create, search, claim, approve, moderate, suspend, audit |
 
 `npm run test:api` is the fastest way to show a working API without any cloud account: it boots the
-real app and exercises 37 request/response cases, including the 400/401/403 paths.
+real app and exercises 42 request/response cases, including the 400/401/403 paths.
 
 ## Non-Postman checks
 
-`npm run test:smoke` boots the Express app (no database needed) and asserts 14 things: `/api/v1/health`
+`npm run test:smoke` boots the Express app (no database needed) and asserts 18 things: `/api/v1/health`
 `200` with a `requestId`, the `/api` alias, `/api/v1/meta` `200`, the home page `200`, a branded `404`,
 an unknown API route `404`, invalid registration `400`, and `401` for item creation, my-items,
 dashboard summary, admin stats, moderation queue, audit log and notifications without a token.

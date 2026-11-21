@@ -30,6 +30,7 @@ process.env.REQUIRE_MODERATION = 'false';
   const hash = await bcrypt.hash('Password@123', 10);
   await users.createUser({ name: 'Arjun Rao', email: 'arjun@saiuniversity.edu.in', password: hash });
   await users.createUser({ name: 'Meera Iyer', email: 'meera@saiuniversity.edu.in', password: hash });
+  await users.createUser({ name: 'Rahul Sharma', email: 'rahul@saiuniversity.edu.in', password: hash });
   await users.createUser({ name: 'Admin', email: 'admin@saiuniversity.edu.in', password: hash, role: 'admin' });
 
   const server = app.listen(0);
@@ -81,6 +82,9 @@ process.env.REQUIRE_MODERATION = 'false';
 
     const meeraLogin = await call('POST', '/api/v1/auth/login', { body: { email: 'meera@saiuniversity.edu.in', password: 'Password@123' } });
     const meeraToken = meeraLogin.json.token;
+
+    const rahulLogin = await call('POST', '/api/v1/auth/login', { body: { email: 'rahul@saiuniversity.edu.in', password: 'Password@123' } });
+    const rahulToken = rahulLogin.json.token;
 
     const badLogin = await call('POST', '/api/v1/auth/login', { body: { email: 'arjun@saiuniversity.edu.in', password: 'wrong' } });
     check('wrong password is rejected with 401', badLogin.status === 401 && badLogin.json.error.code === 'UNAUTHENTICATED');
@@ -215,6 +219,105 @@ process.env.REQUIRE_MODERATION = 'false';
     const health = await call('GET', '/api/v1/health');
     check('health endpoint returns a request id', health.status === 200 && Boolean(health.json.requestId));
     check('X-Request-Id header present', Boolean(health.headers.get('x-request-id')));
+    /* ------------------ negative and security cases ------------------- */
+    // malformed ids must be rejected before they reach Postgres
+    const badIds = [
+      ['GET', '/api/v1/items/not-a-uuid', undefined],
+      ['PATCH', '/api/v1/claims/xyz', {}],
+      ['PATCH', '/api/v1/notifications/abc/read', {}],
+    ];
+    for (const [method, path, body] of badIds) {
+      const r = await call(method, path, { token: adminToken, body });
+      const leaked = JSON.stringify(r.json).toLowerCase().includes('select ');
+      check(`malformed id on ${method} ${path} -> 404, no SQL leak`, r.status === 404 && !leaked, `status ${r.status}`);
+    }
+
+    const badDate = await call('GET', '/api/v1/items?from=not-a-date');
+    check('invalid from date is 400, not 500', badDate.status === 400 && badDate.json.error.code === 'VALIDATION_ERROR');
+
+    // uploads: wrong MIME and oversize are both refused
+    const makeForm = (file) => {
+      const fd = new FormData();
+      fd.set('title', 'Upload probe');
+      fd.set('description', 'Probing the upload guard with a deliberately invalid file.');
+      fd.set('category', 'Other');
+      fd.set('type', 'lost');
+      fd.set('location', 'Cafeteria');
+      fd.set('dateLostOrFound', '2026-11-15');
+      if (file) fd.set('image', file.blob, file.name);
+      return fd;
+    };
+
+    const badType = await call('POST', '/api/v1/items', {
+      token,
+      form: makeForm({ blob: new Blob(['%PDF-1.4 fake'], { type: 'application/pdf' }), name: 'evil.html' }),
+    });
+    check('non-image upload is rejected with 400', badType.status === 400 && /Only JPG/.test(badType.json.error.message));
+
+    const tooBig = await call('POST', '/api/v1/items', {
+      token,
+      form: makeForm({ blob: new Blob([new Uint8Array(3 * 1024 * 1024)], { type: 'image/png' }), name: 'big.png' }),
+    });
+    check('oversized image is rejected with 413', tooBig.status === 413);
+
+    const goodUpload = await call('POST', '/api/v1/items', {
+      token,
+      form: makeForm({ blob: new Blob([new Uint8Array(1024)], { type: 'image/png' }), name: 'photo.png' }),
+    });
+    check('a valid PNG is stored with a .png filename',
+      goodUpload.status === 201 && /\.png$/.test(goodUpload.json.item.imageUrl),
+      goodUpload.json.item?.imageUrl);
+
+    // moderation: a hidden listing disappears from the public surface
+    const guestHidden = await call('GET', `/api/v1/items/${itemId}`);
+    check('hidden listing is 404 for a guest', guestHidden.status === 404);
+
+    const ownerHidden = await call('GET', `/api/v1/items/${itemId}`, { token });
+    check('hidden listing is still visible to its owner', ownerHidden.status === 200 && ownerHidden.json.item.status === 'rejected');
+
+    const listAfterHide = await call('GET', '/api/v1/items?limit=50');
+    check('hidden listing is absent from public search', !listAfterHide.json.items.some((i) => i._id === itemId));
+
+    // suspension must invalidate a token that was issued earlier
+    const staleToken = await call('GET', '/api/v1/auth/me', { token: meeraToken });
+    check('a token issued before suspension stops working', staleToken.status === 401 && staleToken.json.error.code === 'UNAUTHENTICATED');
+
+    /* --------------------- claim business rules ----------------------- */
+    const ownClaim = await call('POST', '/api/v1/claims', { token, body: { itemId, message: 'claiming my own listing should be refused' } });
+    check('cannot claim your own listing', ownClaim.status === 400);
+
+    const closedClaim = await call('POST', '/api/v1/claims', { token: rahulToken, body: { itemId, message: 'claiming a listing that is no longer open' } });
+    check('cannot claim a listing that is not open', closedClaim.status === 400);
+
+    // two claimants, one approval: the rival must be auto-rejected
+    const item3 = await call('POST', '/api/v1/items', {
+      token,
+      form: (() => {
+        const fd = new FormData();
+        fd.set('title', 'Grey Umbrella');
+        fd.set('description', 'Found a grey folding umbrella near the auditorium steps after the seminar.');
+        fd.set('category', 'Other');
+        fd.set('type', 'found');
+        fd.set('location', 'Auditorium');
+        fd.set('dateLostOrFound', '2026-11-16');
+        return fd;
+      })(),
+    });
+    const id3 = item3.json.item._id;
+    const claimA = await call('POST', '/api/v1/claims', { token: rahulToken, body: { itemId: id3, message: 'That is my umbrella, it has a broken rib on the left side.' } });
+    const claimB = await call('POST', '/api/v1/claims', { token: adminToken, body: { itemId: id3, message: 'I believe this umbrella is mine, the handle has a scratch.' } });
+    check('two different users can claim the same item', claimA.status === 201 && claimB.status === 201);
+
+    const approveA = await call('PATCH', `/api/v1/claims/${claimA.json.claim._id}`, { token, body: { status: 'approved' } });
+    check('owner approves the first claim', approveA.status === 200 && approveA.json.claim.status === 'approved');
+
+    const receivedAfter = await call('GET', '/api/v1/claims/received', { token });
+    const rival = receivedAfter.json.claims.find((c) => c._id === claimB.json.claim._id);
+    check('approving one claim auto-rejects the rival', Boolean(rival) && rival.status === 'rejected');
+
+    const ownerReject = await call('PATCH', `/api/v1/items/${id3}/status`, { token, body: { status: 'rejected' } });
+    check('an owner cannot hide their own listing (admin-only)', ownerReject.status === 403);
+
   } catch (err) {
     fail += 1;
     console.log(`FAIL  unexpected error: ${err.message}`);

@@ -47,7 +47,7 @@ export function categoryIcon(category) {
 }
 
 export function badge(text, kind) {
-  return `<span class="badge badge-${kind}">${escapeHtml(text)}</span>`;
+  return `<span class="badge badge-${escapeHtml(kind)}">${escapeHtml(text)}</span>`;
 }
 
 /* ------------------------- item status vocabulary ----------------------- */

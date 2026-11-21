@@ -9,7 +9,7 @@ WHAT YOU NEED BEFORE STARTING
                                     "LTS" button, then Next-Next-Finish
   3. A Supabase database    (free)  see STEP 4 below
   4. This project folder unzipped somewhere like
-     C:\Users\<yourname>\Documents\campus-lost-found
+     C:\Users\<yourname>\Documents\lostly
 
 You do NOT need to install any database on your laptop.
 You will use a free Supabase (PostgreSQL) project instead (STEP 4).
@@ -18,8 +18,8 @@ You will use a free Supabase (PostgreSQL) project instead (STEP 4).
 ----------------------------------------------------------------
 STEP 1 - UNZIP THIS PROJECT
 ----------------------------------------------------------------
-  - Right-click campus-lost-found-portal.zip  ->  Extract All  ->  Extract
-  - You now have a folder named "campus-lost-found".
+  - Right-click lostly-campus-portal.zip  ->  Extract All  ->  Extract
+  - You now have a folder named "lostly".
   - Open that folder. You should see these files:
         package.json
         server.js
@@ -35,7 +35,7 @@ STEP 2 - OPEN THE FOLDER IN VS CODE
 ----------------------------------------------------------------
   - Open VS Code.
   - Menu: File  ->  Open Folder...
-  - Select the "campus-lost-found" folder  ->  click "Select Folder"
+  - Select the "lostly" folder  ->  click "Select Folder"
   - If VS Code asks "Do you trust the authors?"  ->  click "Yes, I trust".
 
   In the left sidebar you should now see src, public, docs, package.json.
@@ -58,33 +58,30 @@ STEP 3 - OPEN THE TERMINAL AND INSTALL
 
 
 ----------------------------------------------------------------
-STEP 4 - CREATE YOUR FREE DATABASE (Supabase)
+STEP 4 - CREATE YOUR FREE DATABASE (Supabase / PostgreSQL)
 ----------------------------------------------------------------
   Do this in your web browser, not in VS Code.
 
-  a) Go to  https://www.mongodb.com/cloud/atlas/register
-     Sign up (Google sign-in is fastest). Choose the FREE plan.
+  a) Go to  https://supabase.com  ->  "Start your project"  ->  sign in
+     with GitHub or Google. It is free.
 
-  b) Create a cluster:  choose "M0 FREE", any region near India
-     (Mumbai / Singapore), then click "Create Deployment".
-     Wait 1-3 minutes until the cluster is ready.
+  b) Click "New project".
+        Name:     lostly
+        Region:   Mumbai or Singapore (nearest to you)
+        Password: choose a DATABASE PASSWORD and write it down.
+     Click "Create new project" and wait 1-2 minutes.
 
-  c) It asks you to create a database user.
-     Username:  student
-     Password:  click "Autogenerate" and COPY THE PASSWORD somewhere
-                (you need it in step d). Then click Create.
+  c) Click the green "Connect" button at the top of the project page.
+     Choose the tab "Session pooler"  (NOT "Direct connection" - that one
+     is IPv6 only and will not work from Render).
 
-  d) Copy the connection string it shows you. It looks like:
-        mongodb+srv://student:<db_password>@cluster0.ab12c.mongodb.net/?retryWrites=true&w=majority
-     Replace <db_password> with the password you copied.
-     Add the database name "campus_lost_found" before the "?", like this:
-        mongodb+srv://student:MyPass123@cluster0.ab12c.mongodb.net/campus_lost_found?retryWrites=true&w=majority
-     Keep this full string in Notepad - you paste it in STEP 5.
+  d) Copy the whole connection string. It looks like:
+        postgresql://postgres.abcdefghijklmnop:YOUR-PASSWORD@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+     Replace YOUR-PASSWORD with the password from step b.
+     Keep it on ONE line. Keep it in Notepad - you paste it in STEP 5.
 
-  e) IMPORTANT: on the left menu click
-        Security  ->  Network Access  ->  Add IP Address  ->  "Allow Access
-        from Anywhere"  (0.0.0.0/0)  ->  Confirm
-     If you skip this, the app cannot connect.
+  e) Nothing else to configure: the tables are created by our own
+     db/schema.sql in STEP 7 (npm run db:setup).
 
 
 ----------------------------------------------------------------
@@ -130,7 +127,7 @@ STEP 6 - CREATE THE TABLES, THEN FILL THEM WITH SAMPLE DATA
 
   You should see lines like:
         [db] PostgreSQL connected (server time ...)
-        [seed] 12 sample items inserted
+        [seed] 13 sample items inserted
         [seed] Done. Demo logins: ...
 
   If you see "DATABASE_URL is missing" -> your .env file is wrong (STEP 5).
@@ -146,14 +143,14 @@ STEP 7 - START THE APP
         npm start
 
   You should see:
-        [server] Campus Lost & Found running on http://localhost:5000
+        [server] LOSTLY running on http://localhost:5000
 
   Leave this terminal running. Do not close VS Code.
   Now open your browser (Chrome) and go to:
 
         http://localhost:5000
 
-  You should see the Campus Lost & Found home page with 12 items.
+  You should see the LOSTLY home page with 13 items.
 
 
 ----------------------------------------------------------------
@@ -206,10 +203,10 @@ COMMON PROBLEMS
 AFTER IT RUNS
 ----------------------------------------------------------------
   The rest of the project work (GitHub, deployment, report) is
-  explained in Campus_Lost_Found_Build_and_Submission_Guide.docx
+  explained in docs/DEPLOYMENT.md
   and in the docs/ folder:
 
         docs/API.md          every API endpoint
-        docs/TESTING.md      the 18 Postman test cases
+        docs/TESTING.md      the 27 Postman test cases
         docs/DEPLOYMENT.md   how to put it online
 ================================================================

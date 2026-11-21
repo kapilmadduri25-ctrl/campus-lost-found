@@ -4,8 +4,8 @@
  *
  * The API is versioned: all calls go to /api/v1.
  */
-const TOKEN_KEY = 'clf_token';
-const USER_KEY = 'clf_user';
+const TOKEN_KEY = 'lostly_token';
+const USER_KEY = 'lostly_user';
 export const API_BASE = '/api/v1';
 
 export function getToken() {
@@ -57,10 +57,18 @@ export async function api(path, { method = 'GET', body, headers = {} } = {}) {
 
   const url = path.startsWith('/api/') ? path : `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
 
+  // a stalled request must never leave a page spinning forever
+  if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+    opts.signal = AbortSignal.timeout(15000);
+  }
+
   let res;
   try {
     res = await fetch(url, opts);
-  } catch {
+  } catch (err) {
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+      throw new Error('The server took too long to respond. Please try again.');
+    }
     throw new Error('Cannot reach the server. Check your connection and try again.');
   }
 
@@ -82,7 +90,14 @@ export async function api(path, { method = 'GET', body, headers = {} } = {}) {
     err.code = apiError.code;
     err.details = apiError.details || data?.details;
     err.requestId = data?.requestId;
-    if (res.status === 401 && !path.includes('/auth/login')) clearSession();
+    if (res.status === 401 && !path.includes('/auth/')) {
+      clearSession();
+      // an expired session should land on the login page, not on a dead error state
+      if (!window.location.pathname.startsWith('/login')) {
+        const next = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/login.html?next=${next}`;
+      }
+    }
     throw err;
   }
 

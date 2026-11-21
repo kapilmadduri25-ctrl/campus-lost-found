@@ -98,6 +98,10 @@
 }
 
 /* ------------------------------ item page ------------------------------ */
+.detail-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+@media (min-width: 980px) {
+  .detail-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; }
+}
 .claim-panel { position: sticky; top: calc(var(--header-h) + 1rem); }
 
 /* ---------------------------- dashboard page --------------------------- */

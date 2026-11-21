@@ -11,9 +11,12 @@ const {
   getAuditLogs,
   adminDeleteItem,
 } = require('../controllers/adminController');
+const { validateParamId } = require('../middleware/validate');
 const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
+
+router.param('id', validateParamId);
 
 router.use(protect, adminOnly); // every admin route needs a logged-in admin
 
