@@ -119,6 +119,7 @@ function render(statsRes, itemsRes, queueRes, claimsRes, usersRes, auditRes) {
     </div>
 
     <h2 class="mt-3" style="font-size:1.2rem">All listings</h2>
+    <p class="small muted" style="margin:0 0 .5rem">Showing ${items.length} of ${itemsRes.total} listings, newest first</p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Reported by</th><th>Status</th><th>Actions</th></tr></thead>

@@ -42,6 +42,7 @@ export function mountHeader() {
       const open = nav.classList.toggle('open');
       toggle.setAttribute('aria-expanded', String(open));
       toggle.querySelector('.nav-toggle-label').textContent = open ? 'Close' : 'Menu';
+      if (open) nav.querySelector('a')?.focus();
     });
 
     // Escape closes the menu and returns focus to the toggle

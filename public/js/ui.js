@@ -145,17 +145,26 @@ export function toast(message, kind = 'info') {
 }
 
 /** Shows a list of field errors returned by the API. */
-export function showFormErrors(container, err) {
-  if (!container) return;
-  const details = err?.details;
-  if (Array.isArray(details) && details.length) {
-    container.innerHTML = `<div class="alert alert-error">${details
-      .map((d) => `${escapeHtml(d.field)}: ${escapeHtml(d.message)}`)
-      .join('<br>')}</div>`;
-  } else {
-    container.innerHTML = `<div class="alert alert-error">${escapeHtml(err?.message || 'Something went wrong')}</div>`;
-  }
+export function showFormErrors(container, error) {
+  const details = error.details || [];
+  container.hidden = false;
   container.classList.remove('hidden');
+  container.innerHTML = `<strong>${escapeHtml(error.message)}</strong>${
+    details.length
+      ? `<ul>${details.map((d) => `<li>${escapeHtml(d.message)}</li>`).join('')}</ul>`
+      : ''
+  }`;
+
+  // tell assistive tech which fields failed, and put the cursor on the first one
+  const form = container.closest('form');
+  if (!form) return;
+  form.querySelectorAll('[aria-invalid="true"]').forEach((el) => el.removeAttribute('aria-invalid'));
+  details.forEach((d) => {
+    const field = form.querySelector(`[name="${d.field}"]`) || form.querySelector(`#${d.field}`);
+    if (field) field.setAttribute('aria-invalid', 'true');
+  });
+  const first = form.querySelector('[aria-invalid="true"]');
+  if (first) first.focus();
 }
 
 export function qs(name) {

@@ -6,6 +6,8 @@ const notifications = require('../db/notifications');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { findPossibleMatches } = require('../utils/findMatches');
+const { withTransaction } = require('../config/db');
+const { mapItem } = require('../db/mappers');
 const { record } = require('../utils/audit');
 
 // what an anonymous visitor may see in search results
@@ -211,10 +213,26 @@ const updateStatus = asyncHandler(async (req, res) => {
     }
   }
 
-  const item = await items.setStatus(existing._id, {
-    status,
-    resolvedAt: status === 'resolved' ? new Date() : undefined,
-  });
+  let item;
+  if (status === 'resolved') {
+    // closing a listing must also close the claims still hanging off it, in one step
+    item = await withTransaction(async (client) => {
+      const updated = await client.query(
+        `update items set status = 'resolved', resolved_at = now(), updated_at = now()
+         where id = $1 returning *`,
+        [existing._id]
+      );
+      await client.query(
+        `update claims set status = 'rejected', decision_note = $2, reviewed_by = $3,
+                reviewed_at = now(), updated_at = now()
+         where item = $1 and status in ('pending', 'info_requested')`,
+        [existing._id, 'The listing was closed by its owner', req.user._id]
+      );
+      return mapItem(updated.rows[0], { includePrivate: true });
+    });
+  } else {
+    item = await items.setStatus(existing._id, { status });
+  }
 
   await record(req, {
     action: 'item.status_changed',

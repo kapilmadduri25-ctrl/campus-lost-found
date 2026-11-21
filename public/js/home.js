@@ -135,11 +135,19 @@ async function load() {
 
     renderPagination(data);
     syncUrl();
+    syncChips();
   } catch (err) {
     countEl.textContent = '';
     grid.innerHTML = errorState(err.message, 'Could not load listings');
     bindRetry(grid, load);
   }
+}
+
+/** Keeps the quick-filter chips announcing the same state as the select. */
+function syncChips() {
+  document.querySelectorAll('#quick-chips .chip').forEach((chip) => {
+    chip.setAttribute('aria-pressed', String(chip.dataset.cat === state.category));
+  });
 }
 
 /* ------------------------------- events -------------------------------- */

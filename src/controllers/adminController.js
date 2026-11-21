@@ -42,7 +42,7 @@ const getStats = asyncHandler(async (req, res) => {
 /** GET /api/v1/admin/items — every listing, any status. */
 const getAllItems = asyncHandler(async (req, res) => {
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-  const limit = Math.min(100, parseInt(req.query.limit, 10) || 20);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
 
   const statuses = req.query.status ? [req.query.status] : items.ALL_STATUSES;
   const { items: rows, total } = await items.findItems({ statuses, type: req.query.type, page, limit, sort: 'newest' });
@@ -154,7 +154,7 @@ const setUserStatus = asyncHandler(async (req, res) => {
 
 /** GET /api/v1/admin/audit */
 const getAuditLogs = asyncHandler(async (req, res) => {
-  const limit = Math.min(200, parseInt(req.query.limit, 10) || 60);
+  const limit = Math.min(200, Math.max(1, parseInt(req.query.limit, 10) || 60));
   const logs = await auditLogs.list(limit);
   res.json({ success: true, count: logs.length, logs });
 });

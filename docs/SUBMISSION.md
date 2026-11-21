@@ -22,7 +22,7 @@ Project: **LOSTLY — Campus Lost & Found Portal** · Web Technology and Interne
 | Database connectivity and CRUD | `src/db/` + `db/schema.sql` (Postgres via `pg`) |
 | Authentication, authorisation, error handling | `src/middleware/auth.js`, `src/controllers/*`, `src/middleware/errorHandler.js` |
 | Dynamic data retrieval and display | every page renders from `/api/v1/...` |
-| 8+ Postman test cases | `postman/Campus_Lost_Found.postman_collection.json` (27 requests, 45+ assertions) |
+| 8+ Postman test cases | `postman/LOSTLY.postman_collection.json` (27 requests, 45+ assertions) |
 | 10+ sample records | `src/seed.js` (13 listings, 4 users) |
 | One custom feature | duplicate-match alerts (`src/utils/findMatches.js`) + admin charts |
 | Security checks | bcrypt, JWT, ownership checks, parameterised SQL, `sanitize` middleware, rate limiting, `db/rls.sql` |

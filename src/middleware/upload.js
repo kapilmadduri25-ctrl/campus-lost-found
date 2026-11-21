@@ -39,5 +39,19 @@ const upload = multer({
   },
 });
 
+/**
+ * Mounted right after upload.single(). If the request ends in a 4xx (validation
+ * failed, wrong owner, ...) the file that multer already wrote is deleted, so
+ * rejected submissions cannot fill the disk with unreferenced images.
+ */
+function cleanupOnFailure(req, res, next) {
+  if (!req.file) return next();
+  res.on('finish', () => {
+    if (res.statusCode >= 400) fs.promises.unlink(req.file.path).catch(() => {});
+  });
+  next();
+}
+
 module.exports = upload;
 module.exports.EXTENSION = EXTENSION;
+module.exports.cleanupOnFailure = cleanupOnFailure;

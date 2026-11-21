@@ -1,6 +1,6 @@
 # Testing evidence (Postman)
 
-Collection: `postman/Campus_Lost_Found.postman_collection.json` — **30 requests, 55+ assertions**.
+Collection: `postman/LOSTLY.postman_collection.json` — **30 requests, 55+ assertions**.
 The brief asks for at least eight test cases. Rows numbered `A17x` are covered by the automated suite (`npm run test:api`) rather than by a Postman request.
 
 ## How to run

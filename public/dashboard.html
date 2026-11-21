@@ -73,14 +73,14 @@
       <div class="stat-grid four" id="my-stats"></div>
 
       <div class="tabs mt-3" role="tablist" aria-label="Dashboard sections">
-        <button role="tab" aria-selected="true" data-tab="listings" id="tab-listings">My listings</button>
-        <button role="tab" aria-selected="false" data-tab="claims" id="tab-claims">My claims</button>
-        <button role="tab" aria-selected="false" data-tab="received" id="tab-received">Claims received</button>
-        <button role="tab" aria-selected="false" data-tab="notifications" id="tab-notifications">Notifications</button>
+        <button role="tab" aria-selected="true" data-tab="listings" id="tab-listings" aria-controls="panel-listings">My listings</button>
+        <button role="tab" aria-selected="false" data-tab="claims" id="tab-claims" aria-controls="panel-claims">My claims</button>
+        <button role="tab" aria-selected="false" data-tab="received" id="tab-received" aria-controls="panel-received">Claims received</button>
+        <button role="tab" aria-selected="false" data-tab="notifications" id="tab-notifications" aria-controls="panel-notifications">Notifications</button>
       </div>
 
       <div class="mt-2">
-        <div id="panel-listings" class="panel"></div>
+        <div id="panel-listings" class="panel" role="tabpanel" aria-labelledby="tab-listings" tabindex="0"></div>
         <div id="panel-claims" class="panel hidden"></div>
         <div id="panel-received" class="panel hidden"></div>
         <div id="panel-notifications" class="panel hidden"></div>

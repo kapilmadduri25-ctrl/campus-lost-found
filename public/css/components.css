@@ -207,7 +207,7 @@ textarea {
 
 input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.85; }
 
-input:hover, select:hover, textarea:hover { border-color: var(--slate-400); }
+input:hover, select:hover, textarea:hover { border-color: var(--border-strong); }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
