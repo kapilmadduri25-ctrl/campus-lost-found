@@ -62,6 +62,7 @@ api.get('/meta', (req, res) => {
       { value: 'title', label: 'Name A-Z' },
     ],
     moderationEnabled: process.env.REQUIRE_MODERATION === 'true',
+    emailEnabled: require('./utils/mailer').isConfigured(),
   });
 });
 

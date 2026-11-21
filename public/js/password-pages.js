@@ -8,6 +8,21 @@ setYear();
 wirePasswordToggles();
 
 const forgotForm = document.getElementById('forgot-form');
+
+/* Be honest about whether an email will actually be sent. */
+if (forgotForm) {
+  api('/api/v1/meta')
+    .then((meta) => {
+      if (meta.emailEnabled) return;
+      const notice = document.getElementById('mail-notice');
+      notice.hidden = false;
+      notice.classList.remove('hidden');
+      notice.innerHTML = '<strong>No mail server is configured on this deployment.</strong> '
+        + 'No email will arrive. In development the reset link appears below the form; on the live site, '
+        + 'ask the course administrator to reset your password.';
+    })
+    .catch(() => {});
+}
 const resetForm = document.getElementById('reset-form');
 const errorBox = document.getElementById('form-errors');
 const submitBtn = document.getElementById('submit-btn');

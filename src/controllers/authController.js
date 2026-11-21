@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const users = require('../db/users');
 const resets = require('../db/passwordResets');
+const mailer = require('../utils/mailer');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { signToken } = require('../utils/token');
@@ -64,16 +65,39 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const row = await users.findUserForLogin(email);
   let devToken;
+  let delivered = false;
 
   if (row && row.is_active) {
     const { token, expiresAt } = await resets.issue(row.id);
-    console.log(`[auth] password reset requested for ${email}; link expires ${expiresAt.toISOString()}`);
-    if (process.env.NODE_ENV !== 'production') devToken = token;
+
+    if (mailer.isConfigured()) {
+      try {
+        delivered = await mailer.sendPasswordReset({
+          to: row.email,
+          name: row.name,
+          token,
+          appUrl: process.env.APP_URL,
+        });
+      } catch (err) {
+        console.error('[auth] could not send the reset email:', err.message);
+      }
+    } else {
+      // no mail server: the token is logged for the administrator, and returned to the
+      // browser only outside production so the flow stays testable
+      console.log(`[auth] reset token for ${email} (no SMTP configured): ${token} (expires ${expiresAt.toISOString()})`);
+      if (process.env.NODE_ENV !== 'production') devToken = token;
+    }
   }
+
+  const message = mailer.isConfigured()
+    ? 'If that address has an account, a reset link is on its way. It expires in 30 minutes.'
+    : 'If that address has an account, an administrator can reset it for you. This deployment has no mail server configured.';
 
   res.json({
     success: true,
-    message: 'If that address has an account, a reset link is on its way. It expires in 30 minutes.',
+    delivered,
+    emailEnabled: mailer.isConfigured(),
+    message,
     ...(devToken ? { devToken } : {}),
   });
 });

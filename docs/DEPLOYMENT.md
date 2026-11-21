@@ -147,3 +147,23 @@ outstanding claims. On Render, add a **Cron Job** pointing at the same repositor
 | Environment | the same `DATABASE_URL` |
 
 Without a cron job the command can be run by hand from the service **Shell** once a term.
+
+---
+
+## Optional: real password-reset emails
+
+The forgot-password flow works without any email account, but then it can only log the token
+and tell the user to ask an administrator. To send real mail, add these on Render (Brevo's free
+tier allows 300 messages a day; a Gmail app password also works):
+
+| Key | Value |
+|---|---|
+| `SMTP_HOST` | `smtp-relay.brevo.com` (or your provider) |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | your SMTP login |
+| `SMTP_PASS` | your SMTP key |
+| `MAIL_FROM` | `no-reply@yourdomain` (or the SMTP user) |
+| `APP_URL` | `https://lostly-3r3f.onrender.com` |
+
+With those set, `GET /api/v1/meta` reports `emailEnabled: true`, the forgot-password page stops
+showing the "no mail server" notice, and the link is emailed instead of returned to the browser.
