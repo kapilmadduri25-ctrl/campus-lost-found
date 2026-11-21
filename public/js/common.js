@@ -2,9 +2,9 @@
  * common.js - header, navigation and theme behaviour shared by every page.
  * Imported as a module by each page's script.
  */
-import { getUser, isLoggedIn, isAdmin, clearSession } from './api.js';
+import { api, getUser, isLoggedIn, isAdmin, clearSession } from './api.js';
 
-const THEME_KEY = 'clf_theme';
+const THEME_KEY = 'lostly_theme';
 
 /** Light/dark switch. The choice is remembered and applied before paint in <head>. */
 export function mountTheme() {

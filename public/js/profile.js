@@ -1,5 +1,5 @@
 /** Profile page: account details and password change. */
-import { api, getUser, setSession, getToken } from './api.js';
+import { api, getUser, saveSession, getToken } from './api.js';
 import { mountHeader, setYear, requireLogin } from './common.js';
 import { showFormErrors, wirePasswordToggles, toast } from './ui.js';
 
@@ -35,8 +35,7 @@ if (requireLogin()) {
           phone: document.getElementById('phone').value.trim(),
         },
       });
-      setSession(getToken(), updated);
-      mountHeader();
+      saveSession(getToken(), updated);
       profileOk.hidden = false;
       profileOk.classList.remove('hidden');
       profileOk.textContent = 'Profile saved.';

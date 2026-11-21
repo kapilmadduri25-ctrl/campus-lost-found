@@ -1,10 +1,9 @@
 /** Login + registration pages. */
 import { api, saveSession, isLoggedIn, isAdmin } from './api.js';
 import { mountHeader, setYear } from './common.js';
-import { showFormErrors, qs } from './ui.js';
+import { showFormErrors, qs, wirePasswordToggles } from './ui.js';
 
 mountHeader();
-wirePasswordToggles();
 setYear();
 wirePasswordToggles();
 
