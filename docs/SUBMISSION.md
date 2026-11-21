@@ -9,7 +9,7 @@ Project: **LOSTLY — Campus Lost & Found Portal** · Web Technology and Interne
 | 1 | Complete source code + GitHub repository link | https://github.com/kapilmadduri25-ctrl/campus-lost-found | **Done** |
 | 2 | Deployed application link | https://lostly-3r3f.onrender.com | **Done** |
 | 3 | Project report in the prescribed Sai University format | Written from `docs/DATABASE.md`, `docs/TESTING.md`, `docs/DEPLOYMENT.md` + screenshots | Pending |
-| 4 | Postman API testing evidence | `postman/` collection (27 requests) + screenshots of the runner | Collection ready, screenshots pending |
+| 4 | Postman API testing evidence | `postman/` collection (30 requests) + screenshots of the runner | Collection ready, screenshots pending |
 
 ## What the examiner will look for, and where it is
 
@@ -22,7 +22,7 @@ Project: **LOSTLY — Campus Lost & Found Portal** · Web Technology and Interne
 | Database connectivity and CRUD | `src/db/` + `db/schema.sql` (Postgres via `pg`) |
 | Authentication, authorisation, error handling | `src/middleware/auth.js`, `src/controllers/*`, `src/middleware/errorHandler.js` |
 | Dynamic data retrieval and display | every page renders from `/api/v1/...` |
-| 8+ Postman test cases | `postman/LOSTLY.postman_collection.json` (27 requests, 45+ assertions) |
+| 8+ Postman test cases | `postman/LOSTLY.postman_collection.json` (30 requests, 55+ assertions) |
 | 10+ sample records | `src/seed.js` (13 listings, 4 users) |
 | One custom feature | duplicate-match alerts (`src/utils/findMatches.js`) + admin charts |
 | Security checks | bcrypt, JWT, ownership checks, parameterised SQL, `sanitize` middleware, rate limiting, `db/rls.sql` |

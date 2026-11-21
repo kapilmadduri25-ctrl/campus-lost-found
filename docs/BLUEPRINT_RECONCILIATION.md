@@ -35,7 +35,7 @@ what was adopted from each, what was deliberately rejected, and where every requ
 | AC-11 | Loading, empty, error, retry and success states | Done | `ui.js` → `spinner()`, `emptyState()`, `errorState()` + `bindRetry()` |
 | AC-12 | Mobile layout, keyboard, labels, focus | Done | mobile-first CSS, `aria-*`, visible focus rings |
 | AC-13 | No secrets committed or shipped to the browser | Done | `.env` git-ignored; only `DATABASE_URL`/`JWT_SECRET` on the server |
-| AC-14 | Tests and smoke checks pass | Done | 27 Postman requests + `npm run test:smoke` (18 assertions) |
+| AC-14 | Tests and smoke checks pass | Done | 30 Postman requests + `npm run test:smoke` (18 assertions) |
 | AC-15 | Notifications and smart matching after MVP | Done early | `findMatches.js`, notification centre |
 
 ## 3. Blueprint features adopted beyond the brief
