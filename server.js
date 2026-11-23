@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
       : '[mail] no SMTP configured - reset links are written to this log only');
 
     const server = app.listen(PORT, () => {
-      console.log(`[server] LOSTLY running on http://localhost:${PORT}`);
+      require('./src/utils/banner').printBanner(PORT);
     });
 
     // graceful shutdown - Render sends SIGTERM on every redeploy
