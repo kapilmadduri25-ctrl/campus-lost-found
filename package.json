@@ -14,7 +14,8 @@
     "test:api": "node scripts/test-api.js",
     "expire": "node scripts/expire.js",
     "mail:test": "node scripts/mail-test.js",
-    "test:e2e": "node scripts/test-e2e.js"
+    "test:e2e": "node scripts/test-e2e.js",
+    "test:postman": "node scripts/test-postman.js"
   },
   "keywords": [
     "express",
@@ -35,12 +36,14 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.5.0",
+    "newman": "^6.2.3",
     "nodemailer": "^10.6.1",
     "pg": "^8.13.1",
     "puppeteer-core": "^24.43.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
-    "pg-mem": "^3.0.5"
+    "pg-mem": "^3.0.5",
+    "newman": "^6.2.3"
   }
 }

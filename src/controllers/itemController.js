@@ -244,7 +244,9 @@ const updateStatus = asyncHandler(async (req, res) => {
   });
 
   await notifications.create({
-    user: item.reporter._id,
+    // existing.reporter comes from the joined read, so it is always populated - the row
+    // returned by `update ... returning *` is not joined and has no reporter object
+    user: existing.reporter._id,
     type: 'status',
     message: `Your listing "${item.title}" is now marked as ${status.replace('_', ' ')}`,
     item: item._id,

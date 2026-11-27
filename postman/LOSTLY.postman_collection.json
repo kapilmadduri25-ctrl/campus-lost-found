@@ -62,7 +62,9 @@
                   "const json = pm.response.json();",
                   "pm.test('token present', () => pm.expect(json.token).to.be.a('string'));",
                   "pm.collectionVariables.set('token', json.token);",
-                  "pm.collectionVariables.set('userId', json.user._id);"
+                  "if (pm.environment.name) pm.environment.set('token', pm.collectionVariables.get('token'));",
+                  "pm.collectionVariables.set('userId', json.user._id);",
+                  "if (pm.environment.name) pm.environment.set('userId', pm.collectionVariables.get('userId'));"
                 ]
               }
             }
@@ -105,6 +107,7 @@
                   "pm.test('200 OK', () => pm.response.to.have.status(200));",
                   "const json = pm.response.json();",
                   "pm.collectionVariables.set('otherToken', json.token);",
+                  "if (pm.environment.name) pm.environment.set('otherToken', pm.collectionVariables.get('otherToken'));",
                   "pm.test('otherToken captured', () => pm.expect(json.token).to.be.a('string'));"
                 ]
               }
@@ -148,6 +151,7 @@
                   "pm.test('200 OK', () => pm.response.to.have.status(200));",
                   "const json = pm.response.json();",
                   "pm.collectionVariables.set('adminToken', json.token);",
+                  "if (pm.environment.name) pm.environment.set('adminToken', pm.collectionVariables.get('adminToken'));",
                   "pm.test('adminToken captured', () => pm.expect(json.token).to.be.a('string'));"
                 ]
               }
@@ -278,7 +282,8 @@
                   "pm.test('pagination metadata present', () => { pm.expect(json.total).to.be.a('number'); pm.expect(json.pages).to.be.a('number'); });",
                   "pm.test('no private fields leak', () => pm.expect(JSON.stringify(json.items)).to.not.include('descriptionPrivate'));",
                   "pm.test('reporter email not exposed', () => pm.expect(JSON.stringify(json.items)).to.not.include('@saiuniversity'));",
-                  "if (json.items.length) pm.collectionVariables.set('itemId', json.items[0]._id);"
+                  "if (json.items.length) pm.collectionVariables.set('itemId', json.items[0]._id);",
+                  "if (pm.environment.name) pm.environment.set('itemId', pm.collectionVariables.get('itemId'));"
                 ]
               }
             }
@@ -403,7 +408,8 @@
                   "pm.test('status is active by default', () => pm.expect(json.item.status).to.eql('active'));",
                   "pm.test('possibleMatches array returned', () => pm.expect(json.possibleMatches).to.be.an('array'));",
                   "pm.test('private details not echoed back', () => pm.expect(json.item.descriptionPrivate).to.be.undefined);",
-                  "pm.collectionVariables.set('newItemId', json.item._id);"
+                  "pm.collectionVariables.set('newItemId', json.item._id);",
+                  "if (pm.environment.name) pm.environment.set('newItemId', pm.collectionVariables.get('newItemId'));"
                 ]
               }
             }
@@ -630,6 +636,10 @@
                 "key": "Authorization",
                 "value": "Bearer {{otherToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
@@ -650,97 +660,6 @@
               "raw": "{\n  \"description\": \"Trying to edit somebody else's listing should fail.\"\n}"
             }
           }
-        },
-        {
-          "name": "Mark item as returned",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
-                  "pm.test('status is resolved', () => pm.expect(pm.response.json().item.status).to.eql('resolved'));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/items/{{newItemId}}/status",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "items",
-                "{{newItemId}}",
-                "status"
-              ]
-            },
-            "description": "Owner resolves their own listing. Expected 200.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"resolved\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Invalid status transition by owner",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('403 Forbidden for an admin-only transition', () => pm.response.to.have.status(403));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/items/{{newItemId}}/status",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "items",
-                "{{newItemId}}",
-                "status"
-              ]
-            },
-            "description": "Only an admin may expire a listing. Expected 403.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"expired\"\n}"
-            }
-          }
         }
       ]
     },
@@ -758,6 +677,7 @@
                   "pm.test('201 created', () => pm.response.to.have.status(201));",
                   "const json = pm.response.json();",
                   "pm.collectionVariables.set('claimId', json.claim._id);",
+                  "if (pm.environment.name) pm.environment.set('claimId', pm.collectionVariables.get('claimId'));",
                   "pm.test('claim starts pending', () => pm.expect(json.claim.status).to.eql('pending'));"
                 ]
               }
@@ -770,6 +690,10 @@
                 "key": "Authorization",
                 "value": "Bearer {{otherToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
@@ -811,6 +735,10 @@
                 "key": "Authorization",
                 "value": "Bearer {{otherToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
@@ -1132,10 +1060,14 @@
                 "key": "Authorization",
                 "value": "Bearer {{adminToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/reports/{{newItemId}}",
+              "raw": "{{baseUrl}}/api/v1/admin/reports/{{pendingItemId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1144,7 +1076,7 @@
                 "v1",
                 "admin",
                 "reports",
-                "{{newItemId}}"
+                "{{pendingItemId}}"
               ]
             },
             "description": "Approve a report. Expected 200 with an admin token.",
@@ -1175,10 +1107,14 @@
                 "key": "Authorization",
                 "value": "Bearer {{adminToken}}",
                 "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/reports/{{newItemId}}",
+              "raw": "{{baseUrl}}/api/v1/admin/reports/{{pendingItemId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1187,7 +1123,7 @@
                 "v1",
                 "admin",
                 "reports",
-                "{{newItemId}}"
+                "{{pendingItemId}}"
               ]
             },
             "description": "Hiding requires a reason. Expected 400 with an admin token.",
@@ -1316,6 +1252,102 @@
               ]
             },
             "description": "Server health endpoint. Expected 200."
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Lifecycle",
+      "item": [
+        {
+          "name": "Mark item as returned",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('status is resolved', () => pm.expect(pm.response.json().item.status).to.eql('resolved'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/items/{{newItemId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "items",
+                "{{newItemId}}",
+                "status"
+              ]
+            },
+            "description": "Owner resolves their own listing. Expected 200.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Invalid status transition by owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('403 Forbidden for an admin-only transition', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/items/{{newItemId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "items",
+                "{{newItemId}}",
+                "status"
+              ]
+            },
+            "description": "Only an admin may expire a listing. Expected 403.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"expired\"\n}"
+            }
           }
         }
       ]
