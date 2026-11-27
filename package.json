@@ -36,14 +36,13 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "^2.5.0",
-    "newman": "^6.2.3",
     "nodemailer": "^10.6.1",
-    "pg": "^8.13.1",
-    "puppeteer-core": "^24.43.1"
+    "pg": "^8.13.1"
   },
   "devDependencies": {
+    "newman": "^6.2.3",
     "nodemon": "^3.1.4",
     "pg-mem": "^3.0.5",
-    "newman": "^6.2.3"
+    "puppeteer-core": "^24.43.1"
   }
 }
