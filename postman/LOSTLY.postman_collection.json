@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "LOSTLY - API Tests (v1)",
-    "description": "30 requests for the LOSTLY campus portal. Run folder 1 first (it captures token, otherToken and adminToken), then the rest in order.",
+    "description": "30 requests for the LOSTLY campus portal. Run folder 1 first (it captures token, otherToken and adminToken), then the rest in order. The image field points at postman/sample-image.png - if Postman asks you to re-select it, pick that file.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -408,6 +408,7 @@
                   "pm.test('status is active by default', () => pm.expect(json.item.status).to.eql('active'));",
                   "pm.test('possibleMatches array returned', () => pm.expect(json.possibleMatches).to.be.an('array'));",
                   "pm.test('private details not echoed back', () => pm.expect(json.item.descriptionPrivate).to.be.undefined);",
+                  "pm.test('uploaded image is linked', () => pm.expect(json.item.imageUrl).to.match(/\\/uploads\\//));",
                   "pm.collectionVariables.set('newItemId', json.item._id);",
                   "if (pm.environment.name) pm.environment.set('newItemId', pm.collectionVariables.get('newItemId'));"
                 ]
@@ -481,7 +482,7 @@
                   "key": "image",
                   "value": "",
                   "type": "file",
-                  "src": []
+                  "src": "postman/sample-image.png"
                 }
               ]
             }
