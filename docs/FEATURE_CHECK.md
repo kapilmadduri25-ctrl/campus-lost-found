@@ -2,7 +2,7 @@
 
 Generated for the final submission. Every row was executed, not assumed.
 
-**Automated coverage: 280 assertions**
+**Automated coverage: 281 assertions**
 
 | Suite | Command | Assertions | What it proves |
 |---|---|---|---|
@@ -10,7 +10,7 @@ Generated for the final submission. Every row was executed, not assumed.
 | Database | `npm run test:db` | 41 | Queries, constraints, transactions, cascade rules |
 | API | `npm run test:api` | 78 | Every HTTP route, auth rules, validation, uploads |
 | Browser (E2E) | `npm run test:e2e` | 75 | The real site in headless Chromium, as a user |
-| Postman | `npm run test:postman` | 68 | The shipped collection, executed with Newman exactly as the Postman runner does |
+| Postman | `npm run test:postman` | 69 | The shipped collection, executed with Newman exactly as the Postman runner does |
 
 The browser suite fails on any JavaScript exception, any console error and any failed
 request, so a page that renders but is silently broken still fails.
