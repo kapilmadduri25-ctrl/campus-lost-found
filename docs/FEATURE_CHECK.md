@@ -2,7 +2,7 @@
 
 Generated for the final submission. Every row was executed, not assumed.
 
-**Automated coverage: 212 assertions**
+**Automated coverage: 280 assertions**
 
 | Suite | Command | Assertions | What it proves |
 |---|---|---|---|
@@ -10,6 +10,7 @@ Generated for the final submission. Every row was executed, not assumed.
 | Database | `npm run test:db` | 41 | Queries, constraints, transactions, cascade rules |
 | API | `npm run test:api` | 78 | Every HTTP route, auth rules, validation, uploads |
 | Browser (E2E) | `npm run test:e2e` | 75 | The real site in headless Chromium, as a user |
+| Postman | `npm run test:postman` | 68 | The shipped collection, executed with Newman exactly as the Postman runner does |
 
 The browser suite fails on any JavaScript exception, any console error and any failed
 request, so a page that renders but is silently broken still fails.
@@ -134,6 +135,9 @@ These were live in the deployed build before this pass:
    lists, producing "please choose a campus location" for a location the user had chosen.
 7. The theme toggle saved to `lostly_theme` while every page restored from `clf_theme`, so
    the dark-mode choice was lost on the next page.
+8. Marking a listing returned **crashed with a 500** when it had no claims: the notification
+   was written against the reporter of an unjoined row, so `user_id` was null. Found only
+   when the Postman collection ran it on a listing nobody had claimed.
 
 ## Still to confirm by hand (cannot be automated from here)
 
@@ -141,4 +145,4 @@ These were live in the deployed build before this pass:
 |---|---|---|
 | Reset email actually arrives | Needs the live SMTP credentials | Live site → forgot password → check inbox/spam |
 | Uploaded photos survive a redeploy | Render's disk is ephemeral on the free tier | Documented as a limitation in the report |
-| Postman collection run | Needs the Postman app | Import both files, run the folder, screenshot the results |
+| Postman screenshots | The run is verified by Newman; the screenshots are the evidence | Import both files, open Runner, Run, capture the summary |
