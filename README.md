@@ -30,6 +30,7 @@ and aligned with the Campus Lost & Found Portal blueprint (privacy, moderation a
 | Duplicate / possible-match alerts + notification centre | `src/utils/findMatches.js` |
 | 13 sample records, 4 users, 1 claim, audit entries | `src/seed.js` |
 | 30 Postman requests / 55+ assertions | `postman/` |
+| 212 automated assertions, feature by feature | `docs/FEATURE_CHECK.md` |
 
 ### Item lifecycle
 

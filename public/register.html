@@ -17,7 +17,7 @@
     // apply the saved colour theme before first paint, so there is no flash
     (function () {
       try {
-        var saved = localStorage.getItem('clf_theme');
+        var saved = localStorage.getItem('lostly_theme') || localStorage.getItem('clf_theme');
         var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (dark) document.documentElement.setAttribute('data-theme', 'dark');
       } catch (e) {}

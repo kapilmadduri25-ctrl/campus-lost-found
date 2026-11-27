@@ -318,6 +318,22 @@ process.env.REQUIRE_MODERATION = 'false';
     const ownerReject = await call('PATCH', `/api/v1/items/${id3}/status`, { token, body: { status: 'rejected' } });
     check('an owner cannot hide their own listing (admin-only)', ownerReject.status === 403);
 
+    /* ------------------------- image upload ---------------------------- */
+    const pngBytes = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+    const uploadForm = new FormData();
+    uploadForm.append('title', 'Uploaded Photo Item');
+    uploadForm.append('description', 'A listing created by the API suite to check photo uploads work.');
+    uploadForm.append('category', 'Other');
+    uploadForm.append('type', 'found');
+    uploadForm.append('location', 'Cafeteria');
+    uploadForm.append('dateLostOrFound', '2026-11-19');
+    uploadForm.append('image', new Blob([pngBytes], { type: 'image/png' }), 'pixel.png');
+
+    const upload = await call('POST', '/api/v1/items', { token, form: uploadForm });
+    check('a valid image upload is accepted',
+      upload.status === 201 && /\/uploads\//.test(upload.json?.item?.imageUrl || ''),
+      `${upload.status} ${upload.json?.item?.imageUrl || ''}`);
+
     /* ------------------ password recovery flow ------------------------ */
     const forgotUnknown = await call('POST', '/api/v1/auth/forgot-password', { body: { email: 'nobody@example.com' } });
     check('forgot-password does not reveal whether an account exists',
