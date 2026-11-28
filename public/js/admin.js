@@ -259,6 +259,25 @@ function render(statsRes, itemsRes, queueRes, claimsRes, usersRes, auditRes) {
     });
   });
 
+  // Download the listing table as CSV
+  root.querySelector('#export-csv')?.addEventListener('click', () => {
+    const rows = [['Reference', 'Title', 'Type', 'Category', 'Location', 'Status', 'Reporter', 'Flags', 'Created']];
+    (items || []).forEach((i) => rows.push([
+      i.reference || '', i.title || '', i.type || '', i.category || '', i.location || '',
+      i.status || '', (i.reporter && i.reporter.name) || '', i.flagCount || 0,
+      i.createdAt ? new Date(i.createdAt).toISOString().slice(0, 10) : '',
+    ]));
+    const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lostly-listings-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
   root.querySelectorAll('[data-del]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       if (!window.confirm('Delete this listing as admin? This also removes its claims.')) return;

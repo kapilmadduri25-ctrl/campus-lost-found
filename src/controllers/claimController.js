@@ -24,17 +24,23 @@ const createClaim = asyncHandler(async (req, res) => {
   const existing = await claims.findByItemAndClaimant(item._id, req.user._id);
   if (existing) throw new ApiError(409, 'You have already submitted a claim for this item');
 
+  // the claim and the listing status move together: a claim that exists against a
+  // listing still marked active breaks the "first claim claims the listing" invariant
   let claim;
   try {
-    claim = await claims.create({ item: item._id, claimant: req.user._id, message, proof });
+    claim = await withTransaction(async (client) => {
+      const created = await claims.create({ item: item._id, claimant: req.user._id, message, proof });
+      if (item.status === 'active') {
+        await client.query(
+          `update items set status = 'claim_requested', updated_at = now() where id = $1`,
+          [item._id]
+        );
+      }
+      return created;
+    });
   } catch (err) {
     if (err.code === '23505') throw new ApiError(409, 'You have already submitted a claim for this item');
     throw err;
-  }
-
-  // the first claim moves the listing to "claim requested"
-  if (item.status === 'active') {
-    await items.setStatus(item._id, { status: 'claim_requested' });
   }
 
   await record(req, {

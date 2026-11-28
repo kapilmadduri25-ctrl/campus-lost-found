@@ -9,6 +9,8 @@ what was adopted from each, what was deliberately rejected, and where every requ
 | **Campus Lost & Found Portal blueprint** (`…Complete_Project_Blueprint.pdf`) | A product/engineering specification with privacy, moderation, audit and acceptance criteria (AC-01…AC-15) | Second — used to raise quality where it does not conflict |
 
 ## 1. Conflicts and how they were resolved
+| **Database engine** | Brief: "MongoDB or another instructor-approved database" | **PostgreSQL (Supabase)** | The brief allows another approved database. Postgres was chosen for real foreign keys, transactions and CHECK constraints — the claim-approval flow depends on a multi-table transaction, which is the natural fit for a relational engine. The JSON shape the front end consumes is unchanged (`_id`, camelCase), so nothing else moved. |
+
 
 | Topic | Brief says | Blueprint says | Decision |
 |---|---|---|---|

@@ -26,7 +26,7 @@ Codes: `VALIDATION_ERROR` (400), `UNAUTHENTICATED` (401), `FORBIDDEN` (403), `NO
 ## Meta and health
 
 ### GET /meta
-Public. `{ categories, locations, statuses, sorts, moderationEnabled }` — used to build the forms.
+Public. `{ categories, locations, statuses, sorts, moderationEnabled, emailEnabled }` — used to build the forms.
 
 ### GET /health
 Public. `{ status: "ok", uptime, timestamp, requestId }`

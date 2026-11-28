@@ -30,7 +30,7 @@ and aligned with the Campus Lost & Found Portal blueprint (privacy, moderation a
 | Duplicate / possible-match alerts + notification centre | `src/utils/findMatches.js` |
 | 13 sample records, 4 users, 1 claim, audit entries | `src/seed.js` |
 | 30 Postman requests / 55+ assertions | `postman/` |
-| 212 automated assertions, feature by feature | `docs/FEATURE_CHECK.md` |
+| 281 automated assertions, feature by feature | `docs/FEATURE_CHECK.md` |
 
 ### Item lifecycle
 
@@ -52,11 +52,11 @@ and every transition writes an entry to the audit log.
 
 - **Frontend:** semantic HTML5, CSS3 (a five-layer design system with light/dark theming, no framework), JavaScript ES2022 modules, Fetch API with `async`/`await`, DOM rendering with escaping.
 - **Backend:** Node.js + Express 4, layered routes → controllers → data access, middleware for auth, validation, uploads, sanitising, request IDs and centralised errors.
-- **Database:** Supabase (PostgreSQL 15) through `pg` — five tables, foreign keys with cascade deletes, unique constraints, indexes, and parameterised SQL only.
+- **Database:** Supabase (PostgreSQL 15) through `pg` — seven tables, foreign keys with cascade deletes, unique constraints, indexes, and parameterised SQL only.
 - **Auth:** JWT bearer tokens, `bcryptjs` hashing, roles (`student`, `admin`), account suspension.
 - **Uploads:** `multer`, JPG/PNG/WEBP/GIF only, 2 MB cap, server-generated filenames.
 - **Security:** `helmet`, CORS allow-list, rate limiting, JSON key sanitiser, ownership checks, explicit private-column projections, output escaping.
-- **Testing:** Postman collection + three database-free automated suites (smoke, db, api).
+- **Testing:** Postman collection + five automated suites (smoke, db, api).
 - **Deployment:** Supabase + Render (see `docs/DEPLOYMENT.md`).
 
 ---
@@ -95,7 +95,7 @@ lostly/
 │   │   ├── components.css       #   buttons, forms, cards, badges, tables
 │   │   ├── layout.css           #   header, hero, sections, grids, footer
 │   │   └── pages.css            #   page-specific rules
-│   ├── js/                      # api, ui, common, home, auth-page, report, item,
+│   ├── js/                      # api, ui, common, home, auth-page, password-pages,
 │   │                            #   dashboard, admin, page
 │   └── uploads/
 ├── postman/                     # collection (30 requests) + environment
@@ -194,7 +194,7 @@ Every response carries `X-Request-Id`; every error uses one shape:
 |---|---|
 | `npm run test:smoke` | 18 assertions: routing, validation, auth guards, 404 page |
 | `npm run test:db` | 41 assertions: the real `schema.sql` plus every query, run against an in-memory Postgres (pg-mem) |
-| `npm run test:api` | 42 assertions: the whole Express API booted on top of that in-memory database — login, create, search, claim, ask for details, reply, approve, moderate, suspend, audit |
+| `npm run test:api` | 78 assertions: the whole Express API booted on top of that in-memory database — login, create, search, claim, ask for details, reply, approve, moderate, suspend, audit |
 
 `docs/TESTING.md` lists every test case with its expected result, including the privacy checks.
 
@@ -242,7 +242,7 @@ The UI is a small design system rather than a downloaded theme:
 - **Layered CSS** — `tokens → base → components → layout → pages`. Colours, spacing, radii, shadows and type live only in `tokens.css`.
 - **Light and dark themes** — one `data-theme="dark"` attribute flips the whole palette; the choice is saved in `localStorage` and applied before first paint, so there is no flash.
 - **Modern CSS** — custom properties, CSS Grid, `clamp()` fluid type, `aspect-ratio` thumbnails, `backdrop-filter` header, mask-image search icon, `:focus-visible` rings, shimmer skeletons, `prefers-reduced-motion` and print styles.
-- **Components** — buttons (5 variants), pills, chips, badges (9 lifecycle states), forms with hints and error states, cards, alerts, tables with sticky headers, tabs, pagination, stat cards, CSS bar charts, toasts, empty and error states with retry.
+- **Components** — buttons (4 variants), pills, chips, badges (6 lifecycle states), forms with hints and error states, cards, alerts, tables with sticky headers, tabs, pagination, stat cards, CSS bar charts, toasts, empty and error states with retry.
 - **Accessible** — skip link, semantic landmarks, labelled controls, `aria-pressed` chips, `aria-selected` tabs, `aria-live` results, keyboard-visible focus.
 
 Design previews (mock data, not submission screenshots) are in `docs/design-preview/`.

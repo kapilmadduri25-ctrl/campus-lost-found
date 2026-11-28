@@ -1,6 +1,6 @@
 # LOSTLY · Database design (PostgreSQL / Supabase)
 
-Five tables, foreign keys with cascade deletes, unique constraints and indexes chosen for the
+Seven tables, foreign keys with cascade deletes, unique constraints and indexes chosen for the
 queries the API actually runs. The full DDL is in [`db/schema.sql`](../db/schema.sql).
 
 ## Relationships

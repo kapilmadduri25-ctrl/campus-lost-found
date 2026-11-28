@@ -117,6 +117,7 @@ async function updateItem(id, fields) {
     description: 'description',
     descriptionPrivate: 'description_private',
     category: 'category',
+    type: 'type',
     location: 'location',
     dateLostOrFound: 'date_lost_or_found',
     contactInfo: 'contact_info',

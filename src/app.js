@@ -17,6 +17,10 @@ const { CATEGORIES, LOCATIONS, STATUSES } = require('./constants');
 
 const app = express();
 
+// Render (and most hosts) put the app behind a proxy. Without this, req.ip is the
+// proxy's address and every rate limiter collapses into one shared bucket.
+app.set('trust proxy', 1);
+
 /* ------------------------------ middleware ------------------------------ */
 app.use(
   helmet({

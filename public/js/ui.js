@@ -149,6 +149,8 @@ export function showFormErrors(container, error) {
   const details = error.details || [];
   container.hidden = false;
   container.classList.remove('hidden');
+  // give the box the same panel treatment the rest of the site uses
+  container.classList.add('alert', 'alert-error');
   container.innerHTML = `<strong>${escapeHtml(error.message)}</strong>${
     details.length
       ? `<ul>${details.map((d) => `<li>${escapeHtml(d.message)}</li>`).join('')}</ul>`

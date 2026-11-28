@@ -54,7 +54,7 @@ npm run seed         # 13 listings, 4 users, 1 claim
 npm start            # http://localhost:5000
 npm run test:smoke   # 18 assertions, no database needed
 npm run test:db      # 41 assertions against in-memory Postgres
-npm run test:api     # 42 assertions, full HTTP surface
+npm run test:api     # 78 assertions, full HTTP surface
 ```
 
 ## Before you submit

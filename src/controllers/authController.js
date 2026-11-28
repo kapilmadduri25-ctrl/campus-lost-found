@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const users = require('../db/users');
 const resets = require('../db/passwordResets');
+const { withTransaction } = require('../config/db');
 const mailer = require('../utils/mailer');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
@@ -40,17 +41,30 @@ const login = asyncHandler(async (req, res) => {
 
 /** GET /api/v1/auth/me - protected */
 const getMe = asyncHandler(async (req, res) => {
-  res.json({ success: true, user: req.user });
+  // re-read with the private fields, so the owner sees the phone they saved
+  const user = await users.findUserById(req.user._id, { includePrivate: true });
+  res.json({ success: true, user: user || req.user });
 });
 
 /** PATCH /api/v1/auth/me - protected */
 const updateMe = asyncHandler(async (req, res) => {
+  const name = String(req.body.name ?? '').trim();
+  const department = String(req.body.department ?? '').trim();
+  const phone = String(req.body.phone ?? '').trim();
+
+  if (name.length < 2 || name.length > 60) {
+    throw new ApiError(400, 'Your name must be between 2 and 60 characters');
+  }
+  if (department.length > 60) throw new ApiError(400, 'Department must be 60 characters or fewer');
+  if (phone.length > 20) throw new ApiError(400, 'Phone must be 20 characters or fewer');
+  if (phone && !/^[0-9+\-()\s]+$/.test(phone)) throw new ApiError(400, 'That does not look like a phone number');
+
   const user = await users.updateUser(req.user._id, {
-    name: req.body.name,
-    department: req.body.department,
-    phone: req.body.phone,
+    name,
+    department,
+    phone,
   });
-  res.json({ success: true, message: 'Profile updated', user });
+  res.json({ success: true, message: 'Profile updated', user: await users.findUserById(req.user._id, { includePrivate: true }) });
 });
 
 /**
@@ -107,13 +121,20 @@ const resetPassword = asyncHandler(async (req, res) => {
   const { token, password } = req.body;
   if (!token || !password) throw new ApiError(400, 'The reset token and a new password are required');
   if (String(password).length < 8) throw new ApiError(400, 'Password must be at least 8 characters');
+  if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+    throw new ApiError(400, 'Password must contain at least one letter and one number');
+  }
 
   const row = await resets.findValid(token);
   if (!row) throw new ApiError(400, 'This reset link is invalid or has expired. Please request a new one.');
 
   const hash = await bcrypt.hash(String(password), 10);
-  await users.updatePassword(row.user_id, hash);
-  await resets.markUsed(row.id);
+  // one transaction: the password and the token must move together, or a crash between
+  // the two leaves a usable reset token after the password has already changed
+  await withTransaction(async (client) => {
+    await client.query('update users set password = $2, updated_at = now() where id = $1', [row.user_id, hash]);
+    await client.query('update password_resets set used_at = now() where id = $1', [row.id]);
+  });
 
   res.json({ success: true, message: 'Password updated. You can sign in now.' });
 });

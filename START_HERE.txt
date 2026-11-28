@@ -143,7 +143,7 @@ STEP 7 - START THE APP
         npm start
 
   You should see:
-        [server] LOSTLY running on http://localhost:5000
+        local   http://localhost:5000
   (the first line after "[db] PostgreSQL connected" is
    "[db] schema up to date" - the app creates its own tables)
 
@@ -209,6 +209,6 @@ AFTER IT RUNS
   and in the docs/ folder:
 
         docs/API.md          every API endpoint
-        docs/TESTING.md      the 27 Postman test cases
+        docs/TESTING.md      the 30 Postman test cases
         docs/DEPLOYMENT.md   how to put it online
 ================================================================

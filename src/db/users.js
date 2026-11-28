@@ -23,9 +23,9 @@ async function findUserForLogin(email) {
   return rows[0] || null;
 }
 
-async function findUserById(id) {
+async function findUserById(id, { includePrivate = false } = {}) {
   const { rows } = await query(`select ${COLUMNS} from users where id = $1`, [id]);
-  return rows[0] ? mapUser(rows[0]) : null;
+  return rows[0] ? mapUser(rows[0], { includePrivate }) : null;
 }
 
 async function updateUser(id, fields) {

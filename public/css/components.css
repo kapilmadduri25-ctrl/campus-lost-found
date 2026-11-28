@@ -3,6 +3,22 @@
    alerts, tabs, pagination, charts, toasts. No page layout lives here.
    ========================================================================= */
 
+/* a text button that reads as a link, used outside the nav as well */
+.linklike {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--forest-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.linklike:hover { color: var(--forest-700); }
+.linklike:focus-visible { outline: 2px solid var(--forest-500); outline-offset: 2px; border-radius: 2px; }
+[data-theme="dark"] .linklike { color: var(--forest-100); }
+
 /* ------------------------------- buttons ------------------------------- */
 .btn {
   --btn-bg: var(--accent);

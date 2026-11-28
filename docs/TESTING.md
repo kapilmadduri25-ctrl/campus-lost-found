@@ -53,9 +53,9 @@ The brief asks for at least eight test cases. Rows numbered `A17x` are covered b
 
 | Command | Assertions | What it proves |
 |---|---|---|
-| `npm run test:smoke` | 14 | routing, validation, auth guards, 404 page |
+| `npm run test:smoke` | 18 | routing, validation, auth guards, 404 page |
 | `npm run test:db` | 41 | the real `db/schema.sql` plus every SQL query, against an in-memory Postgres (pg-mem) |
-| `npm run test:api` | 42 | the whole Express API on that in-memory database: login, create, search, claim, approve, moderate, suspend, audit |
+| `npm run test:api` | 78 | the whole Express API on that in-memory database: login, create, search, claim, approve, moderate, suspend, audit |
 
 `npm run test:api` is the fastest way to show a working API without any cloud account: it boots the
 real app and exercises 77 request/response cases, including the 400/401/403 paths.
