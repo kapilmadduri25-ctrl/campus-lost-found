@@ -17,7 +17,7 @@ assigned exactly one:
 | **Claymorphism** | Friendly accents — empty states, stat cards, hero steps, notification rows, pills | thick soft shadows and a warm fill read as approachable, which matters on an empty board |
 | **Blobmorphism** | Organic shape — the background field, the avatar, the match score | the only places a non-geometric silhouette is justified |
 | **Skeuomorphism** | Physical details — paper grain, the tape on a card, the returned-listing stamp | a found item is a physical object |
-| **Neubrutalism** | Loud actions — primary CTAs, status badges, the mobile menu | hard ink border, solid offset shadow, no blur: reserved for the few things that should shout |
+| **Neubrutalism** | Loud actions — primary CTAs and the mobile menu only | a forest-inked 1.5px border and a 3px offset shadow: reserved for the two things that should shout. Status badges were tried here first and reverted — a hard black outline on every card is noise, not hierarchy |
 
 **The hierarchy rule:** an element is either **loud** (neubrutalism) or **quiet**
 (neumorphism) — never both. Primary actions shout; everything else whispers. Mixing all

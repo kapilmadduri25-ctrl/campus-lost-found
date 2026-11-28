@@ -23,9 +23,9 @@
   --clay-fill-2:      #f6efe3;
   --clay-shadow:
     0 1px 0 rgba(255, 255, 255, 0.95) inset,
-    0 -2px 6px rgba(176, 141, 87, 0.10) inset,
-    0 10px 18px -10px rgba(176, 141, 87, 0.45),
-    0 18px 30px -22px rgba(20, 24, 28, 0.35);
+    0 -1px 4px rgba(176, 141, 87, 0.08) inset,
+    0 6px 12px -8px rgba(176, 141, 87, 0.35),
+    0 12px 22px -18px rgba(20, 24, 28, 0.28);
   --clay-radius:      1.4rem;
 
   /* brutalism */
@@ -73,11 +73,11 @@ body::after {
   z-index: -2;
   pointer-events: none;
   filter: blur(44px);
-  opacity: 0.62;
+  opacity: 0.34;
   background:
-    radial-gradient(38% 32% at 18% 22%, var(--blob-1), transparent 70%),
-    radial-gradient(34% 30% at 82% 14%, var(--blob-2), transparent 72%),
-    radial-gradient(42% 36% at 68% 88%, var(--blob-3), transparent 70%);
+    radial-gradient(34% 28% at 14% 88%, var(--blob-1), transparent 70%),
+    radial-gradient(30% 26% at 88% 74%, var(--blob-2), transparent 72%),
+    radial-gradient(38% 30% at 62% 108%, var(--blob-3), transparent 70%);
   animation: blob-drift 34s ease-in-out infinite alternate;
 }
 
@@ -205,16 +205,14 @@ body::after {
 }
 
 /* =========================================================================
-   NEUBRUTALISM  —  the loud layer
-   Only primary actions, status badges and the mobile menu. Hard ink border,
-   solid offset shadow, no blur, no gradient. Press moves the block into its
-   own shadow, which is the whole point of the style.
+   NEUBRUTALISM  —  the loud layer, kept to two places
+   Only primary actions and the mobile menu. Status badges deliberately stay
+   soft: a hard black outline on every card is noise, not hierarchy.
    ========================================================================= */
-.btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger),
-.badge {
-  border: var(--brutal-border);
-  border-radius: 0.5rem;
-  box-shadow: var(--brutal-shadow);
+.btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) {
+  border: 1.5px solid var(--forest-900);
+  border-radius: 0.55rem;
+  box-shadow: 3px 3px 0 rgba(11, 44, 37, 0.85);
 }
 
 .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) {
@@ -229,12 +227,12 @@ body::after {
 .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger):hover {
   background: var(--forest-700);
   transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0 var(--brutal-ink);
+  box-shadow: 4px 4px 0 rgba(11, 44, 37, 0.9);
 }
 
 .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger):active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--brutal-ink);
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 rgba(11, 44, 37, 0.85);
 }
 
 [data-theme="dark"] .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) {
@@ -242,14 +240,21 @@ body::after {
   color: #0b1512;
 }
 
-/* badges are stamps: small, hard-edged, unapologetic */
+/* badges are stamps, not blocks: a tinted pill with a hairline edge */
 .badge {
-  box-shadow: var(--brutal-shadow-sm);
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  font-weight: 650;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   font-size: 0.66rem;
-  padding: 0.18rem 0.45rem;
+  padding: 0.16rem 0.5rem;
+}
+
+[data-theme="dark"] .badge {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 /* the returned stamp stays a stamp, not a brutal block */
