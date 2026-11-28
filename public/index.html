@@ -37,11 +37,11 @@
 
     <div class="header-tools">
       <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme" title="Switch between light and dark">
-        <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
-        <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+        <span class="theme-icon theme-icon-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8.2 8.2 0 1 0 10.5 10.5z"/></svg></span>
+        <span class="theme-icon theme-icon-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg></span>
       </button>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
-        <span aria-hidden="true">☰</span><span class="nav-toggle-label">Menu</span>
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span><span class="nav-toggle-label">Menu</span>
       </button>
     </div>
 
@@ -75,23 +75,8 @@
         </div>
       </div>
 
-      <div class="hero-visual" aria-hidden="true">
-        <div class="float-card fc-1">
-          <div class="fc-row"><span class="badge badge-found">found</span><span class="badge badge-active">active</span></div>
-          <h4>Black Dell Inspiron laptop</h4>
-          <p>📍 Main Library · 15 Nov 2026</p>
-        </div>
-
-        <div class="float-card fc-3">
-          <div class="fc-row"><span class="match-score">87% match</span></div>
-          <p style="margin-top:.35rem;color:var(--text-soft)">Possible match for “Blue steel water bottle”</p>
-        </div>
-
-        <div class="float-card fc-2">
-          <div class="fc-row"><span class="badge badge-lost">lost</span><span class="badge badge-claim_requested">claim requested</span></div>
-          <h4>Blue Water Bottle</h4>
-          <p>📍 Sports Complex · 13 Nov 2026</p>
-        </div>
+      <div class="hero-visual" id="hero-preview" aria-live="polite">
+        <!-- filled from the live board, so the home page never shows invented data -->
       </div>
     </div>
   </section>

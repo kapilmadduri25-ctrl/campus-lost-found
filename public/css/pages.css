@@ -190,3 +190,42 @@
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
 }
+
+/* the hero's fallback: three steps, not invented listings */
+.hero-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-steps li {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1rem 1.1rem;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
+}
+
+.hero-steps strong { display: block; font-size: var(--text-sm); }
+.hero-steps p { margin: 0.2rem 0 0; font-size: var(--text-xs); color: var(--text-soft); }
+
+.step-icon {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex: none;
+  border-radius: 50%;
+  background: var(--forest-100);
+  color: var(--forest-700);
+}
+
+.step-icon svg { width: 1.1rem; height: 1.1rem; }
+[data-theme="dark"] .step-icon { background: rgba(29, 122, 99, 0.22); color: var(--forest-100); }

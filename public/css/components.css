@@ -803,3 +803,53 @@ tbody tr:hover { background: var(--surface-2); }
   background: var(--danger);
   vertical-align: middle;
 }
+
+/* ------------------------------- icons ---------------------------------- */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.icon svg {
+  width: 1.05em;
+  height: 1.05em;
+  stroke: currentColor;
+  display: block;
+}
+
+/* the category mark on an item card */
+.item-thumb .icon svg {
+  width: 3rem;
+  height: 3rem;
+  opacity: 0.55;
+}
+
+.detail-image .icon svg {
+  width: 4.2rem;
+  height: 4.2rem;
+  opacity: 0.6;
+}
+
+.item-thumb,
+.detail-image {
+  color: var(--forest-600);
+}
+
+[data-theme="dark"] .item-thumb,
+[data-theme="dark"] .detail-image {
+  color: var(--forest-100);
+}
+
+.meta-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+}
+
+.meta-with-icon .icon svg {
+  width: 0.95em;
+  height: 0.95em;
+  opacity: 0.75;
+}

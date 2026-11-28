@@ -1,6 +1,6 @@
 /** Home page: search, filters, sorting, pagination. */
 import { api } from './api.js';
-import { itemCard, emptyState, spinner, escapeHtml, qs, errorState, bindRetry } from './ui.js';
+import { itemCard, emptyState, spinner, escapeHtml, qs, errorState, bindRetry, badge, statusBadge, formatDate, icon } from './ui.js';
 import { mountHeader, setYear } from './common.js';
 
 mountHeader();
@@ -133,6 +133,7 @@ async function load() {
       ? data.items.map(itemCard).join('')
       : emptyState('Nothing here yet', 'Try a different keyword or clear the filters, or report the item yourself.');
 
+    renderHeroPreview(data.items);
     renderPagination(data);
     syncUrl();
     syncChips();
@@ -211,3 +212,33 @@ async function loadCounts() {
 loadMeta();
 load();
 loadCounts();
+
+/** The hero shows the three newest real listings - never invented placeholders. */
+function renderHeroPreview(items) {
+  const host = document.getElementById('hero-preview');
+  if (!host) return;
+
+  const top = (items || []).slice(0, 3);
+
+  // no listings yet: show how the portal works rather than invented cards
+  if (!top.length) {
+    host.innerHTML = `
+      <ol class="hero-steps">
+        <li><span class="step-icon">${icon('flag')}</span><div><strong>Report it</strong><p>A minute, one photo, the place you last had it.</p></div></li>
+        <li><span class="step-icon">${icon('search')}</span><div><strong>It looks for a match</strong><p>Every new report is compared with open listings of the opposite type.</p></div></li>
+        <li><span class="step-icon">${icon('check')}</span><div><strong>Claim it privately</strong><p>Describe something only the owner would know. Nobody else sees it.</p></div></li>
+      </ol>`;
+    return;
+  }
+
+  host.innerHTML = top
+    .map(
+      (item, i) => `
+      <a class="float-card fc-${(i % 3) + 1}" href="/item.html?id=${encodeURIComponent(item._id)}">
+        <div class="fc-row">${badge(item.type, item.type)} ${statusBadge(item.status)}</div>
+        <h4>${escapeHtml(item.title)}</h4>
+        <p class="meta-with-icon">${icon('pin')}${escapeHtml(item.location)} · ${formatDate(item.dateLostOrFound)}</p>
+      </a>`
+    )
+    .join('');
+}

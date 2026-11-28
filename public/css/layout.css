@@ -415,3 +415,19 @@
   border-top: 1px solid var(--border);
   font-size: var(--text-xs);
 }
+
+/* the theme toggle and the mobile menu now carry inline SVG */
+.theme-icon svg,
+.nav-toggle svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: block;
+  stroke: currentColor;
+}
+
+.empty .big .icon svg,
+.empty .big svg {
+  width: 2.4rem;
+  height: 2.4rem;
+  opacity: 0.55;
+}

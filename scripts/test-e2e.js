@@ -130,6 +130,10 @@ function check(name, ok, detail = '') {
   check('home page renders the hero', home.includes('Lost it?'), home.slice(0, 60));
   check('home page lists the seeded items', home.includes('Black Dell Inspiron Laptop'));
   check('home page shows both items', home.includes('Blue Water Bottle'));
+  const iconCount = await page.$$eval('.item-card .item-thumb svg', (e) => e.length).catch(() => 0);
+  check('item cards use an SVG icon, not an emoji', iconCount >= 2, `${iconCount} svg`);
+  const emoji = await page.evaluate(() => /[\u{1F300}-\u{1FAFF}]/u.test(document.body.innerText));
+  check('no emoji left in the visible page text', !emoji);
   check('the lost/found counters are filled', /\d+\s+lost reports/.test(home));
 
   /* --------------------------------------------------------- 2. search */

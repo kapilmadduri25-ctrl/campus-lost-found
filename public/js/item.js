@@ -1,7 +1,7 @@
 /** Item detail page + claim submission. */
 import { api, getUser, isLoggedIn, isAdmin } from './api.js';
 import { mountHeader, setYear } from './common.js';
-import { escapeHtml, formatDate, timeAgo, categoryIcon, badge, statusBadge, statusLabel, toast, showFormErrors, qs, errorState, bindRetry } from './ui.js';
+import { escapeHtml, formatDate, timeAgo, categoryIcon, icon, badge, statusBadge, statusLabel, toast, showFormErrors, qs, errorState, bindRetry } from './ui.js';
 
 mountHeader();
 setYear();
@@ -22,7 +22,7 @@ async function load() {
     render(item);
   } catch (err) {
     root.innerHTML = err.status === 404
-      ? '<div class="empty"><div class="big">🔍</div><h3>Item not found</h3><p class="muted">It may have been removed or hidden by a moderator.</p><a class="btn mt-2" href="/index.html">Back to listings</a></div>'
+      ? `<div class="empty"><div class="big">${icon('search')}</div><h3>Item not found</h3><p class="muted">It may have been removed or hidden by a moderator.</p><a class="btn mt-2" href="/index.html">Back to listings</a></div>`
       : errorState(err.message);
     bindRetry(root, load);
   }
@@ -36,7 +36,7 @@ function render(item) {
 
   const image = item.imageUrl
     ? `<div class="detail-image"><img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.title)}"></div>`
-    : `<div class="detail-image" style="display:grid;place-items:center;min-height:220px;font-size:3rem">${categoryIcon(item.category)}</div>`;
+    : `<div class="detail-image" style="display:grid;place-items:center;min-height:220px;font-size:3.4rem">${categoryIcon(item.category)}</div>`;
 
   const moderationNote = isOwner && item.status === 'rejected' && item.moderationReason
     ? `<div class="alert alert-error mt-2" style="margin-bottom:0">Hidden by a moderator: ${escapeHtml(item.moderationReason)}</div>`
