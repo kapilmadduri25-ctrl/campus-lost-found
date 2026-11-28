@@ -1,0 +1,312 @@
+/* =========================================================================
+   7. EXPRESSIVE  —  six materials, six jobs
+   ------------------------------------------------------------------------
+   Six visual languages on one site only works if each one owns a role. This
+   file is that contract. Nothing here is "applied everywhere"; each block is
+   scoped to the elements whose job matches the material.
+
+     LIQUID GLASS   floating layers ....... nav, toasts, hero cards, modals
+     GLASS          content surfaces ....... cards, tables, panels      (depth.css)
+     NEUMORPHISM    quiet controls ......... outline buttons, inputs     (depth.css)
+     CLAYMORPHISM   friendly accents ....... empty states, stats, steps, chips
+     BLOBMORPHISM   organic shapes ......... background, match score, avatar
+     SKEUOMORPHISM  physical details ...... paper grain, tape, stamps    (depth.css)
+     NEUBRUTALISM   loud actions .......... primary CTAs, badges, mobile menu
+
+   The hierarchy rule: an element is either LOUD (neubrutalism) or QUIET
+   (neumorphism), never both. Primary actions shout; everything else whispers.
+   ========================================================================= */
+
+:root {
+  /* clay: thick soft outer shadow, strong inner light, saturated pastel fill */
+  --clay-fill:        #fffdf8;
+  --clay-fill-2:      #f6efe3;
+  --clay-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 -2px 6px rgba(176, 141, 87, 0.10) inset,
+    0 10px 18px -10px rgba(176, 141, 87, 0.45),
+    0 18px 30px -22px rgba(20, 24, 28, 0.35);
+  --clay-radius:      1.4rem;
+
+  /* brutalism */
+  --brutal-ink:       #14181c;
+  --brutal-shadow:    4px 4px 0 var(--brutal-ink);
+  --brutal-shadow-sm: 2px 2px 0 var(--brutal-ink);
+  --brutal-border:    2px solid var(--brutal-ink);
+
+  /* liquid glass: a second, sharper specular layer over the glass */
+  --liquid-sheen:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 38%),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 26%);
+
+  /* blobs */
+  --blob-1: rgba(29, 122, 99, 0.16);
+  --blob-2: rgba(176, 141, 87, 0.18);
+  --blob-3: rgba(164, 68, 47, 0.10);
+}
+
+[data-theme="dark"] {
+  --clay-fill:        #232a30;
+  --clay-fill-2:      #1b2126;
+  --clay-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 -2px 8px rgba(0, 0, 0, 0.35) inset,
+    0 12px 22px -14px rgba(0, 0, 0, 0.8);
+  --brutal-ink:       #f4f0e8;
+  --liquid-sheen:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 26%);
+  --blob-1: rgba(29, 122, 99, 0.28);
+  --blob-2: rgba(176, 141, 87, 0.22);
+  --blob-3: rgba(164, 68, 47, 0.18);
+}
+
+/* =========================================================================
+   BLOBMORPHISM  —  the background is three slow organic fields
+   Decorative only: aria-hidden by construction, behind everything, never
+   behind small text.
+   ========================================================================= */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  z-index: -2;
+  pointer-events: none;
+  filter: blur(44px);
+  opacity: 0.62;
+  background:
+    radial-gradient(38% 32% at 18% 22%, var(--blob-1), transparent 70%),
+    radial-gradient(34% 30% at 82% 14%, var(--blob-2), transparent 72%),
+    radial-gradient(42% 36% at 68% 88%, var(--blob-3), transparent 70%);
+  animation: blob-drift 34s ease-in-out infinite alternate;
+}
+
+@keyframes blob-drift {
+  from { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+  to   { transform: translate3d(2%, 1.5%, 0) scale(1.06); }
+}
+
+/* the avatar and the match score are the two places an organic shape earns its keep */
+.nav-user::before {
+  border-radius: 42% 58% 55% 45% / 48% 42% 58% 52%;
+  background: linear-gradient(140deg, var(--forest-500), var(--gold-500));
+}
+
+.match-score {
+  border-radius: 42% 58% 55% 45% / 48% 42% 58% 52%;
+  padding: 0.32rem 0.85rem;
+  background: linear-gradient(140deg, var(--forest-100), var(--gold-100));
+  border: 1px solid var(--border-strong);
+}
+
+[data-theme="dark"] .match-score {
+  background: linear-gradient(140deg, rgba(29, 122, 99, 0.35), rgba(176, 141, 87, 0.25));
+}
+
+/* =========================================================================
+   LIQUID GLASS  —  the layers that float over content
+   Two specular bands over the glass base, a hairline rim, and a soft inner
+   refraction. Only for things that genuinely hover: nav, toasts, hero cards.
+   ========================================================================= */
+.site-header .nav-shell,
+.toast,
+.float-card,
+.auth-shell {
+  position: relative;
+  isolation: isolate;
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(26px) saturate(1.7);
+  backdrop-filter: blur(26px) saturate(1.7);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 22px 44px -30px rgba(20, 24, 28, 0.55);
+}
+
+.site-header .nav-shell::before,
+.toast::before,
+.float-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--liquid-sheen);
+  opacity: 0.7;
+  z-index: -1;
+}
+
+/* a single travelling highlight, the way light moves across wet glass */
+.site-header .nav-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%);
+  opacity: 0;
+  transition: opacity 500ms ease;
+  z-index: -1;
+}
+
+.site-header .nav-shell:hover::after { opacity: 1; }
+
+/* =========================================================================
+   CLAYMORPHISM  —  small, friendly, puffy surfaces
+   Empty states, stat cards, the hero steps, the notification rows, chips.
+   Never a whole page section: clay everywhere reads as a toy.
+   ========================================================================= */
+.empty,
+.hero-steps li,
+.stat,
+.notif,
+.chip,
+.step-icon,
+.pill {
+  background: linear-gradient(180deg, var(--clay-fill), var(--clay-fill-2));
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: var(--clay-shadow);
+}
+
+.empty,
+.hero-steps li {
+  border-radius: var(--clay-radius);
+  padding: 1.6rem 1.4rem;
+}
+
+.stat {
+  border-radius: var(--clay-radius);
+}
+
+.chip,
+.pill {
+  border-radius: 999px;
+}
+
+.step-icon {
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffffff, var(--forest-100));
+  color: var(--forest-700);
+}
+
+[data-theme="dark"] .empty,
+[data-theme="dark"] .hero-steps li,
+[data-theme="dark"] .stat,
+[data-theme="dark"] .notif,
+[data-theme="dark"] .chip,
+[data-theme="dark"] .pill {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme="dark"] .step-icon {
+  background: linear-gradient(180deg, #2a3238, #1c2227);
+  color: var(--forest-100);
+}
+
+/* =========================================================================
+   NEUBRUTALISM  —  the loud layer
+   Only primary actions, status badges and the mobile menu. Hard ink border,
+   solid offset shadow, no blur, no gradient. Press moves the block into its
+   own shadow, which is the whole point of the style.
+   ========================================================================= */
+.btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger),
+.badge {
+  border: var(--brutal-border);
+  border-radius: 0.5rem;
+  box-shadow: var(--brutal-shadow);
+}
+
+.btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) {
+  background: var(--forest-600);
+  color: var(--cream-25);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  transform: translate(0, 0);
+  transition: transform 110ms ease, box-shadow 110ms ease, background 140ms ease;
+}
+
+.btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger):hover {
+  background: var(--forest-700);
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--brutal-ink);
+}
+
+.btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger):active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--brutal-ink);
+}
+
+[data-theme="dark"] .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) {
+  background: var(--forest-500);
+  color: #0b1512;
+}
+
+/* badges are stamps: small, hard-edged, unapologetic */
+.badge {
+  box-shadow: var(--brutal-shadow-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  padding: 0.18rem 0.45rem;
+}
+
+/* the returned stamp stays a stamp, not a brutal block */
+.badge-resolved,
+.badge-recovered {
+  box-shadow: none;
+  border-width: 2px;
+  transform: rotate(-1.5deg);
+}
+
+/* the mobile menu is a panel that slides over the page */
+@media (max-width: 859px) {
+  #main-nav {
+    border: var(--brutal-border);
+    border-radius: 0.6rem;
+    box-shadow: var(--brutal-shadow);
+    background: var(--cream-25);
+    padding: 0.6rem;
+  }
+
+  [data-theme="dark"] #main-nav {
+    background: #171c20;
+  }
+}
+
+/* =========================================================================
+   Restraint: motion, fallbacks, contrast
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  body::after { animation: none; }
+  .site-header .nav-shell::after { transition: none; }
+  .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) { transition: none; }
+}
+
+@media (prefers-contrast: more) {
+  .empty,
+  .hero-steps li,
+  .stat,
+  .notif,
+  .chip,
+  .pill {
+    border-color: var(--border-strong);
+    box-shadow: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header .nav-shell,
+  .toast,
+  .float-card,
+  .auth-shell {
+    background: var(--surface);
+  }
+}
+
+/* on a small screen the background blobs cost more than they give */
+@media (max-width: 640px) {
+  body::after { filter: blur(28px); opacity: 0.55; }
+  .btn:not(.btn-outline):not(.btn-ghost):not(.btn-danger) { box-shadow: var(--brutal-shadow-sm); }
+}

@@ -4,18 +4,30 @@ LOSTLY is a campus lost-and-found board, so the interface borrows from the physi
 world it replaces: noticeboards, luggage tags, paper forms and rubber stamps. Everything
 below is a rule, not a preference.
 
-## The one rule
+## The rule: six materials, six jobs
 
-**One depth treatment per element.**
+Six visual languages on one site only works if each owns a role. Every element is
+assigned exactly one:
 
-| Role | Technique | Why |
+| Material | Owns | Why it belongs there |
 |---|---|---|
-| Containers — cards, nav, tables, toasts, match cards | **Glass** | translucency separates layers without adding weight; the page keeps its paper feel |
-| Controls — buttons, inputs, chips, segmented controls | **Neumorphism** | a control should look pressable; the inset shadow tells you where to type |
-| Character — item cards, tags, status stamps | **Skeuomorphism** | a found item is a physical object: grain, tape, perforation, a rubber stamp on a returned listing |
+| **Liquid glass** | Floating layers — nav, toasts, the auth shell, the hero panel | the things that hover over the page should look like they are hovering: two specular bands, a hairline rim, 26px blur |
+| **Glass** | Content surfaces — cards, tables, panels | translucency separates layers without adding weight; the page keeps its paper feel |
+| **Neumorphism** | Quiet controls — outline buttons, inputs, chips | a control should look pressable; the inset shadow tells you where to type |
+| **Claymorphism** | Friendly accents — empty states, stat cards, hero steps, notification rows, pills | thick soft shadows and a warm fill read as approachable, which matters on an empty board |
+| **Blobmorphism** | Organic shape — the background field, the avatar, the match score | the only places a non-geometric silhouette is justified |
+| **Skeuomorphism** | Physical details — paper grain, the tape on a card, the returned-listing stamp | a found item is a physical object |
+| **Neubrutalism** | Loud actions — primary CTAs, status badges, the mobile menu | hard ink border, solid offset shadow, no blur: reserved for the few things that should shout |
 
-Applying all three to the same surface is what makes an interface look like a mock-up
-rather than a product. Applied by role, they read as one material world.
+**The hierarchy rule:** an element is either **loud** (neubrutalism) or **quiet**
+(neumorphism) — never both. Primary actions shout; everything else whispers. Mixing all
+seven onto one surface is what makes an interface look like a mock-up rather than a
+product. Assigned by role, they read as one material world.
+
+Files: `tokens.css` (colour, type, spacing) → `depth.css` (glass, neumorphism, paper) →
+`expressive.css` (liquid glass, clay, blob, neubrutalism) → `components.css` →
+`layout.css` → `pages.css`. Later files win, which is why the order in every page's
+`<head>` matters.
 
 Files: `public/css/tokens.css` (colour, type, spacing), `depth.css` (glass, neumorphism,
 paper), `components.css` (the components themselves), `layout.css` (page frame),
@@ -33,9 +45,13 @@ pin, search, flag, check, clock, user, shield, calendar, moon, sun, menu, lock, 
 
 ## No invented data
 
-The home page hero renders the three newest real listings and links to them. When the board
-is empty it explains the three steps instead of showing fake cards. Nothing on the site
-displays sample content that is not in the database.
+The home page hero is a single panel listing the three newest real listings, each a link.
+When the board is empty it explains the three steps instead of showing fake cards. Nothing
+on the site displays sample content that is not in the database.
+
+An earlier version floated three rotated, overlapping cards in the hero. They were replaced:
+three absolute-positioned cards collide as soon as their content changes length, and the
+rotation was decoration for its own sake.
 
 ## Accessibility that is not decoration
 

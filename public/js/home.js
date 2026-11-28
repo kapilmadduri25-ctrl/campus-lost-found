@@ -1,6 +1,6 @@
 /** Home page: search, filters, sorting, pagination. */
 import { api } from './api.js';
-import { itemCard, emptyState, spinner, escapeHtml, qs, errorState, bindRetry, badge, statusBadge, formatDate, icon } from './ui.js';
+import { itemCard, emptyState, spinner, escapeHtml, qs, errorState, bindRetry, badge, statusBadge, formatDate, icon, categoryIcon } from './ui.js';
 import { mountHeader, setYear } from './common.js';
 
 mountHeader();
@@ -220,7 +220,6 @@ function renderHeroPreview(items) {
 
   const top = (items || []).slice(0, 3);
 
-  // no listings yet: show how the portal works rather than invented cards
   if (!top.length) {
     host.innerHTML = `
       <ol class="hero-steps">
@@ -231,14 +230,26 @@ function renderHeroPreview(items) {
     return;
   }
 
-  host.innerHTML = top
-    .map(
-      (item, i) => `
-      <a class="float-card fc-${(i % 3) + 1}" href="/item.html?id=${encodeURIComponent(item._id)}">
-        <div class="fc-row">${badge(item.type, item.type)} ${statusBadge(item.status)}</div>
-        <h4>${escapeHtml(item.title)}</h4>
-        <p class="meta-with-icon">${icon('pin')}${escapeHtml(item.location)} · ${formatDate(item.dateLostOrFound)}</p>
-      </a>`
-    )
-    .join('');
+  host.innerHTML = `
+    <div class="hero-panel">
+      <p class="hero-panel-title">${icon('clock')} Just posted</p>
+      <ul class="hero-panel-list">
+        ${top
+          .map(
+            (item) => `
+          <li>
+            <a href="/item.html?id=${encodeURIComponent(item._id)}">
+              <span class="hp-icon">${categoryIcon(item.category)}</span>
+              <span class="hp-body">
+                <strong>${escapeHtml(item.title)}</strong>
+                <span class="hp-meta">${statusBadge(item.status)} ${escapeHtml(item.location)}</span>
+              </span>
+              <span class="hp-type">${badge(item.type, item.type)}</span>
+            </a>
+          </li>`
+          )
+          .join('')}
+      </ul>
+      <a class="hero-panel-foot" href="/index.html#recent">See everything on the board</a>
+    </div>`;
 }
