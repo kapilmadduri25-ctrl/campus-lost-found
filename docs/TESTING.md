@@ -1,7 +1,13 @@
 # Testing evidence (Postman)
 
-Collection: `postman/LOSTLY.postman_collection.json` — **30 requests, 55+ assertions**.
+Collection: `postman/LOSTLY.postman_collection.json` — **30 requests, 68 assertions**.
 The brief asks for at least eight test cases. Rows numbered `A17x` are covered by the automated suite (`npm run test:api`) rather than by a Postman request.
+
+## Photo upload
+
+The collection creates a listing without a photo: Postman cannot resolve a file path shipped in
+the repository, and a request that silently sends nothing is worse than one that says so. The
+multipart path — valid image, wrong MIME, oversized file — is covered by `npm run test:api`.
 
 ## How to run
 

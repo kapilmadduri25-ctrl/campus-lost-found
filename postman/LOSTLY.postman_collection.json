@@ -408,11 +408,9 @@
                   "pm.test('status is active by default', () => pm.expect(json.item.status).to.eql('active'));",
                   "pm.test('possibleMatches array returned', () => pm.expect(json.possibleMatches).to.be.an('array'));",
                   "pm.test('private details not echoed back', () => pm.expect(json.item.descriptionPrivate).to.be.undefined);",
-                  "const hasFile = (pm.request.body && pm.request.body.formdata) ? pm.request.body.formdata.toJSON().some((p) => p.type === 'file' && p.src && p.src.length) : false;",
-                  "if (!hasFile) { console.log('no image attached in this run - upload covered by npm run test:api'); }",
-                  "pm.test('uploaded image is linked', () => { if (!hasFile) return; pm.expect(json.item.imageUrl).to.match(/\\/uploads\\//); });",
                   "pm.collectionVariables.set('newItemId', json.item._id);",
-                  "if (pm.environment.name) pm.environment.set('newItemId', pm.collectionVariables.get('newItemId'));"
+                  "if (pm.environment.name) pm.environment.set('newItemId', pm.collectionVariables.get('newItemId'));",
+                  "console.log('note: photo upload is covered by npm run test:api (multipart + MIME checks)');"
                 ]
               }
             }
@@ -479,12 +477,6 @@
                   "key": "contactInfo",
                   "value": "Ask at the library counter",
                   "type": "text"
-                },
-                {
-                  "key": "image",
-                  "value": "",
-                  "type": "file",
-                  "src": "postman/sample-image.png"
                 }
               ]
             }
